@@ -1,36 +1,37 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <!-- 核心：UTF-8编码声明，解决字符解析问题 -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <!-- 核心：移动端视口适配，禁止横向滑动 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>NFC图文制作 | 成果预览</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            /* 兜底字体，兼容所有设备 */
             font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
         }
         body {
             background: #f8f9fa;
             min-height: 100vh;
+            width: 100vw; /* 固定视口宽度，禁止横向滑动 */
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
             position: relative;
             z-index: 1;
+            overflow-x: hidden; /* 彻底禁止横向滑动 */
         }
-        /* 粉蓝黄混合弥散背景 */
+        /* 粉蓝黄弥散背景 */
         body::before {
             content: "";
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             background: linear-gradient(
                 135deg,
                 rgba(255, 228, 235, 0.3),
@@ -40,32 +41,35 @@
             backdrop-filter: blur(80px);
             -webkit-backdrop-filter: blur(80px);
             z-index: -1;
-            overflow: hidden;
         }
-        /* 核心预览容器 */
+        /* 预览容器：移动端精准居中 */
         .preview-container {
-            max-width: 100vw;
+            width: 100%;
+            max-width: 800px;
             max-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
+            padding: 0 10px;
         }
         .result-card {
-            position: relative;
             width: 100%;
             height: auto;
-            max-width: 100%;
-            max-height: 100vh;
-            object-fit: contain;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
+        /* 图片上传/预览修复：移动端兼容 */
         #resultImg {
             width: 100%;
+            max-width: 700px;
             height: auto;
-            max-height: 100vh;
             object-fit: contain;
             border-radius: 12px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            margin: 0 auto; /* 图片居中 */
         }
         /* 拍立得文字层 */
         #resultPolaroidText {
@@ -112,7 +116,7 @@
         .back-btn:hover {
             opacity: 1;
         }
-        /* 引导层 */
+        /* 引导层：移动端绝对居中，无滑动 */
         .empty-guide {
             position: absolute;
             top: 0;
@@ -121,16 +125,15 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            align-items: center; /* 子元素水平居中 */
+            justify-content: center; /* 子元素垂直居中 */
             text-align: center;
-            padding: 20px;
-            box-sizing: border-box; /* 防止padding撑出宽度 */
-            min-width: 300px; /* 给父容器最小宽度，避免压缩文字 */
-            margin: 0 auto; /* 容器自身水平居中 */
-            align-content: center; /* 兼容多元素居中 */
+            padding: 30px 20px;
+            box-sizing: border-box;
+            min-width: 100%; /* 适配移动端宽度 */
+            overflow-x: hidden; /* 禁止横向滑动 */
         }
-        /* 弥散按钮 */
+        /* 按钮：移动端精准居中，兼容所有设备 */
         .go-make-btn {
             padding: 16px 40px;
             background: linear-gradient(135deg, 
@@ -145,11 +148,13 @@
             font-size: 18px;
             font-weight: 500;
             cursor: pointer;
-            margin: 0 auto 20px;
+            margin: 0 auto 20px; /* 水平居中 + 底部间距 */
             box-shadow: 0 6px 20px rgba(180, 190, 250, 0.15);
             transition: all 0.3s ease;
             outline: none;
             border: none;
+            /* 移动端点击兼容 */
+            -webkit-tap-highlight-color: transparent;
         }
         .go-make-btn:hover {
             background: linear-gradient(135deg, 
@@ -171,23 +176,17 @@
         .btn-shake {
             animation: shake 0.5s ease-in-out;
         }
-        /* 核心修复：引导文字排版（解决一个字母占一行） */
+        /* 引导文字：移动端正常换行+居中 */
         .guide-tip {
             font-size: 14px;
             color: #6b7280;
             margin-bottom: 60px;
-            /* 允许正常换行，取消强制单行 */
             white-space: normal;
-            /* 保证单词不被拆分成单个字母 */
             word-wrap: break-word;
             overflow-wrap: break-word;
-            /* 限制最大宽度，避免撑满屏幕 */
-            max-width: 90%;
-            /* 行高舒适，换行后不拥挤 */
+            max-width: 500px;
             line-height: 1.5;
-            /* 文字居中，排版更整齐 */
             text-align: center;
-            /* 确保容器跟随内容宽度，不歪 */
             display: inline-block;
         }
         /* 底部链接 */
@@ -199,41 +198,44 @@
             font-size: 12px;
             color: #9ca3af;
             text-decoration: none;
-            border: none;
-            background: transparent;
+            padding: 0 10px;
+            text-align: center;
+            z-index: 998;
         }
         .site-link:hover {
             color: #6b7280;
             text-decoration: underline;
         }
 
-        /* ========== 手机适配 ========== */
-        /* 小屏手机（320-375px） */
-        @media (max-width: 375px) {
+        /* ========== 移动端专属适配 ========== */
+        @media (max-width: 768px) {
             .guide-tip {
-                font-size: 13px;
+                font-size: 14px;
                 max-width: 95%;
-                line-height: 1.6;
+                line-height: 1.5;
             }
             .go-make-btn {
                 padding: 14px 30px;
                 font-size: 16px;
+                margin: 0 auto 15px;
             }
             #resultImg {
                 max-width: 95vw;
-                height: auto;
             }
-            .site-link {
-                font-size: 11px;
-                padding: 0 10px;
-                text-align: center;
+            .empty-guide {
+                padding: 20px 15px;
             }
         }
-        /* 平板/大屏手机 */
-        @media (min-width: 376px) and (max-width: 768px) {
+        @media (max-width: 375px) {
+            .guide-tip {
+                font-size: 13px;
+            }
             .go-make-btn {
-                padding: 15px 35px;
-                font-size: 17px;
+                padding: 12px 25px;
+                font-size: 15px;
+            }
+            body {
+                padding: 15px 10px;
             }
         }
     </style>
@@ -254,7 +256,8 @@
     <a href="https://你的独立站链接.com" class="site-link" target="_blank">你的独立站名称 | copyright © 2026</a>
 
     <script>
-        const imgUrl = localStorage.getItem('nfcImage');
+        // 修复移动端localStorage兼容 + 图片上传拉取
+        const imgUrl = localStorage.getItem('nfcImage') || '';
         const styleData = JSON.parse(localStorage.getItem('nfcTextStyle') || '{}');
         const resultImg = document.getElementById('resultImg');
         const resultDraggableText = document.getElementById('resultDraggableText');
@@ -263,10 +266,26 @@
         const emptyGuide = document.getElementById('emptyGuide');
         const goMakeBtn = document.getElementById('goMakeBtn');
 
-        // 有图片就显示，无图片显示引导页
-        if (imgUrl) {
+        // 修复移动端路径跳转（避免相对路径失效）
+        const getAbsolutePath = (path) => {
+            const baseUrl = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
+            return baseUrl + path;
+        };
+
+        // 有图片就显示，无图片显示引导页（修复移动端图片加载）
+        if (imgUrl && imgUrl.trim() !== '') {
             emptyGuide.style.display = 'none';
             backBtn.style.display = 'block';
+            // 移动端图片加载兼容
+            resultImg.onload = function() {
+                this.style.display = 'block';
+            };
+            resultImg.onerror = function() {
+                alert('图片加载失败，请重新上传');
+                emptyGuide.style.display = 'flex';
+                backBtn.style.display = 'none';
+            };
+            resultImg.src = imgUrl;
             initResultStyle();
         } else {
             resultImg.style.display = 'none';
@@ -275,8 +294,6 @@
         }
 
         function initResultStyle() {
-            resultImg.src = imgUrl;
-            resultImg.style.display = 'block';
             const textContent = styleData.text || '';
             resultDraggableText.textContent = textContent;
             resultPolaroidText.textContent = textContent;
@@ -329,12 +346,12 @@
             }
         }
 
-        // 按钮点击事件
+        // 修复移动端按钮跳转 + 图片上传
         backBtn.addEventListener('click', () => {
-            window.location.href = './upload.html';
+            window.location.href = getAbsolutePath('upload.html');
         });
         goMakeBtn.addEventListener('click', () => {
-            window.location.href = './editor.html';
+            window.location.href = getAbsolutePath('editor.html');
         });
         goMakeBtn.addEventListener('click', function() {
             this.classList.add('btn-shake');
@@ -343,10 +360,16 @@
             }, 500);
         });
 
-        // 窗口适配
+        // 窗口适配 + 移动端旋转兼容
         window.addEventListener('resize', () => {
             if (imgUrl) {
-                resultImg.style.maxHeight = `${window.innerHeight}px`;
+                resultImg.style.maxHeight = `${window.innerHeight - 80}px`;
+            }
+        });
+        // 移动端初始化适配
+        window.addEventListener('load', () => {
+            if (imgUrl) {
+                resultImg.style.maxHeight = `${window.innerHeight - 80}px`;
             }
         });
     </script>
