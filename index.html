@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <!-- 核心：UTF-8编码声明，解决乱码 -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Manifest what you desire!</title>
+    <title>NFC图文制作 | 成果预览</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            /* 兜底字体，避免渲染异常 */
+            font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
         }
         body {
             background: #f8f9fa;
@@ -21,7 +23,7 @@
             position: relative;
             z-index: 1;
         }
-        /* 粉蓝黄混合弥散背景（核心新增） */
+        /* 粉蓝黄混合弥散背景 */
         body::before {
             content: "";
             position: fixed;
@@ -31,16 +33,16 @@
             height: 100%;
             background: linear-gradient(
                 135deg,
-                rgba(255, 228, 235, 0.3),  /* 淡粉 */
-                rgba(219, 234, 254, 0.3),  /* 淡蓝 */
-                rgba(254, 243, 199, 0.3)   /* 淡黄 */
+                rgba(255, 228, 235, 0.3),
+                rgba(219, 234, 254, 0.3),
+                rgba(254, 243, 199, 0.3)
             );
             backdrop-filter: blur(80px);
             -webkit-backdrop-filter: blur(80px);
             z-index: -1;
             overflow: hidden;
         }
-        /* 核心预览容器：锁定比例+自适应最大尺寸 */
+        /* 核心预览容器 */
         .preview-container {
             max-width: 100vw;
             max-height: 100vh;
@@ -65,7 +67,7 @@
             border-radius: 12px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.1);
         }
-        /* 拍立得文字层（和编辑页样式同步） */
+        /* 拍立得文字层 */
         #resultPolaroidText {
             position: relative;
             width: 100%;
@@ -78,7 +80,7 @@
         #resultPolaroidText.show {
             display: block;
         }
-        /* 图片上的文字层（和编辑页样式同步） */
+        /* 图片文字层 */
         #resultDraggableText {
             position: absolute;
             top: 50%;
@@ -88,9 +90,9 @@
             word-break: break-word;
             max-width: 90%;
             text-align: center;
-            pointer-events: none; /* 禁止点击，纯预览 */
+            pointer-events: none;
         }
-        /* 边角不起眼的返回按钮（仅有内容时显示） */
+        /* 返回按钮 */
         .back-btn {
             position: fixed;
             top: 15px;
@@ -105,12 +107,12 @@
             opacity: 0.7;
             transition: opacity 0.2s;
             z-index: 999;
-            display: none; /* 默认隐藏 */
+            display: none;
         }
         .back-btn:hover {
             opacity: 1;
         }
-        /* 无内容时的引导层 */
+        /* 引导层 */
         .empty-guide {
             position: absolute;
             top: 0;
@@ -124,44 +126,36 @@
             text-align: center;
             padding: 20px;
         }
-        /* 淡粉+淡蓝+淡紫 低饱和弥散风按钮 */
+        /* 弥散按钮 */
         .go-make-btn {
             padding: 16px 40px;
-            /* 淡粉→淡蓝→淡紫 低饱和渐变（核心配色） */
             background: linear-gradient(135deg, 
-                rgba(255, 228, 235, 0.7),  /* 淡粉 */
-                rgba(219, 234, 254, 0.7),  /* 淡蓝 */
-                rgba(232, 221, 255, 0.7)); /* 淡紫 */
-            /* 毛玻璃弥散核心效果 */
+                rgba(255, 228, 235, 0.7),
+                rgba(219, 234, 254, 0.7),
+                rgba(232, 221, 255, 0.7));
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            /* 通透边框增强层次 */
             border: 1px solid rgba(255, 255, 255, 0.9);
-            /* 大圆角 */
             border-radius: 28px;
-            /* 低饱和文字色（和渐变协调） */
             color: #7b61ff;
             font-size: 18px;
             font-weight: 500;
             cursor: pointer;
             margin-bottom: 12px;
-            /* 柔和阴影 */
             box-shadow: 0 6px 20px rgba(180, 190, 250, 0.15);
-            /* 过渡动画 */
             transition: all 0.3s ease;
             outline: none;
             border: none;
         }
         .go-make-btn:hover {
-            /* 悬浮时加深渐变+增强阴影+轻微上浮 */
             background: linear-gradient(135deg, 
-                rgba(255, 228, 235, 0.85), 
-                rgba(219, 234, 254, 0.85), 
+                rgba(255, 228, 235, 0.85),
+                rgba(219, 234, 254, 0.85),
                 rgba(232, 221, 255, 0.85));
             box-shadow: 0 8px 24px rgba(180, 190, 250, 0.2);
             transform: translateY(-2px);
         }
-        /* 摇晃动画关键帧 */
+        /* 摇晃动画 */
         @keyframes shake {
             0% { transform: rotate(0deg) translateY(0); }
             20% { transform: rotate(-5deg) translateY(0); }
@@ -170,32 +164,20 @@
             80% { transform: rotate(3deg) translateY(0); }
             100% { transform: rotate(0deg) translateY(0); }
         }
-        /* 触发摇晃的类 */
         .btn-shake {
             animation: shake 0.5s ease-in-out;
         }
-        /* 修复文字分行问题：关键修改 */
+        /* 引导文字 */
         .guide-tip {
             font-size: 14px;
             color: #6b7280;
             margin-bottom: 60px;
-            /* 新增：尽可能保持一行显示 */
-            white-space: nowrap; 
-            /* 新增：小屏幕时允许换行，且不截断单词 */
+            white-space: nowrap;
             overflow-wrap: break-word;
-            /* 新增：限制最大宽度，避免超出屏幕 */
             max-width: 90%;
-            /* 新增：换行时整体居中，不歪 */
             display: inline-block;
         }
-        /* 适配小屏幕（手机）：自动换行 */
-        @media (max-width: 375px) {
-            .guide-tip {
-                white-space: normal; /* 小屏幕恢复换行 */
-                line-height: 1.5; /* 换行后行高更舒适 */
-            }
-        }
-        /* 底部独立站链接（无边框灰色小字） */
+        /* 底部链接 */
         .site-link {
             position: fixed;
             bottom: 15px;
@@ -211,36 +193,56 @@
             color: #6b7280;
             text-decoration: underline;
         }
+
+        /* ========== 手机适配 ========== */
+        /* 小屏手机（320-375px） */
+        @media (max-width: 375px) {
+            .guide-tip {
+                white-space: normal;
+                line-height: 1.5;
+                font-size: 13px;
+            }
+            .go-make-btn {
+                padding: 14px 30px;
+                font-size: 16px;
+            }
+            #resultImg {
+                max-width: 95vw;
+                height: auto;
+            }
+            .site-link {
+                font-size: 11px;
+                padding: 0 10px;
+                text-align: center;
+            }
+        }
+        /* 平板/大屏手机 */
+        @media (min-width: 376px) and (max-width: 768px) {
+            .go-make-btn {
+                padding: 15px 35px;
+                font-size: 17px;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- 边角返回按钮（仅有内容时显示） -->
     <button class="back-btn" id="backBtn">recreate</button>
-
-    <!-- 预览容器 -->
     <div class="preview-container">
         <div class="result-card">
             <img id="resultImg" alt="preview">
             <div id="resultDraggableText"></div>
             <div id="resultPolaroidText"></div>
-            
-            <!-- 无内容时的引导层 -->
             <div class="empty-guide" id="emptyGuide">
                 <button class="go-make-btn" id="goMakeBtn">📸  start making</button>
                 <p class="guide-tip">Let’s start creating your custom NFC images!</p>
             </div>
         </div>
     </div>
-
-    <!-- 底部独立站链接 -->
     <a href="https://你的独立站链接.com" class="site-link" target="_blank">你的独立站名称 | copyright © 2026</a>
 
     <script>
-        // 读取本地存储的所有样式和内容
         const imgUrl = localStorage.getItem('nfcImage');
         const styleData = JSON.parse(localStorage.getItem('nfcTextStyle') || '{}');
-
-        // 核心元素
         const resultImg = document.getElementById('resultImg');
         const resultDraggableText = document.getElementById('resultDraggableText');
         const resultPolaroidText = document.getElementById('resultPolaroidText');
@@ -248,54 +250,41 @@
         const emptyGuide = document.getElementById('emptyGuide');
         const goMakeBtn = document.getElementById('goMakeBtn');
 
-        // ========== 修复后的核心逻辑：只要有图片就显示，无图片才显示引导页 ==========
-        if (imgUrl) { // 只判断是否有图片，不强制要求文字
-            // 有图片：显示预览，隐藏引导层，显示返回按钮
+        // 有图片就显示，无图片显示引导页
+        if (imgUrl) {
             emptyGuide.style.display = 'none';
             backBtn.style.display = 'block';
             initResultStyle();
         } else {
-            // 无图片：显示引导层，隐藏预览相关
             resultImg.style.display = 'none';
             resultDraggableText.style.display = 'none';
             resultPolaroidText.style.display = 'none';
         }
 
-        // 初始化预览样式（兼容「有图片无文字」的情况）
         function initResultStyle() {
-            // 1. 初始化图片（必显）
             resultImg.src = imgUrl;
-            resultImg.style.display = 'block'; // 确保图片显示
-
-            // 2. 文字内容：有文字才显示，无文字则隐藏文字层
+            resultImg.style.display = 'block';
             const textContent = styleData.text || '';
             resultDraggableText.textContent = textContent;
             resultPolaroidText.textContent = textContent;
 
-            // 有文字才处理文字样式，无文字则隐藏文字层
             if (textContent) {
-                // 3. 文字大小
                 const fontSize = styleData.fontSize || 24;
                 resultDraggableText.style.fontSize = `${fontSize}px`;
                 resultPolaroidText.style.fontSize = `${fontSize}px`;
 
-                // 4. 文字颜色
                 resultDraggableText.style.color = styleData.color || '#ffffff';
                 resultPolaroidText.style.color = styleData.color || '#ffffff';
 
-                // 5. 衬框样式
                 if (styleData.bg) {
                     resultDraggableText.style.background = styleData.bg;
                     resultPolaroidText.style.background = styleData.bg;
-                    // 衬框内边距
                     const bgPadding = styleData.bgPadding || 10;
                     resultDraggableText.style.padding = `${bgPadding}px ${bgPadding * 1.6}px`;
                     resultPolaroidText.style.padding = `${bgPadding}px ${bgPadding * 1.6}px`;
-                    // 衬框圆角
                     const bgRadius = styleData.bgRadius || 8;
                     resultDraggableText.style.borderRadius = `${bgRadius}px`;
                     resultPolaroidText.style.borderRadius = `${bgRadius}px`;
-                    // 拍立得文字居中
                     if (styleData.isPolaroid) {
                         resultPolaroidText.style.display = 'inline-block';
                         resultPolaroidText.style.margin = '0 auto';
@@ -305,18 +294,15 @@
                     resultPolaroidText.style.background = 'transparent';
                 }
 
-                // 6. 阴影+外发光
                 resultDraggableText.style.textShadow = styleData.textShadow || '0 2px 5px rgba(0,0,0,0.6)';
                 resultPolaroidText.style.textShadow = styleData.textShadow || '0 2px 5px rgba(0,0,0,0.6)';
 
-                // 7. 文字位置（非拍立得模式）
                 if (styleData.left && styleData.top && !styleData.isPolaroid) {
                     resultDraggableText.style.left = styleData.left;
                     resultDraggableText.style.top = styleData.top;
                     resultDraggableText.style.transform = 'none';
                 }
 
-                // 8. 拍立得模式切换
                 if (styleData.isPolaroid) {
                     resultDraggableText.style.display = 'none';
                     resultPolaroidText.classList.add('show');
@@ -325,33 +311,26 @@
                     resultDraggableText.style.display = 'block';
                 }
             } else {
-                // 无文字：隐藏所有文字层，只显示图片
                 resultDraggableText.style.display = 'none';
                 resultPolaroidText.style.display = 'none';
             }
         }
 
-        // ========== 按钮点击事件 ==========
-        // 返回重新制作
+        // 按钮点击事件
         backBtn.addEventListener('click', () => {
-            window.location.href = './upload.html'; // 替换成你的编辑页文件名
+            window.location.href = './upload.html';
         });
-
-        // 去制作（无内容时）
         goMakeBtn.addEventListener('click', () => {
-            window.location.href = './editor.html'; // 替换成你的编辑页文件名
+            window.location.href = './editor.html';
         });
-
-        // 新增：按钮点击摇晃效果
         goMakeBtn.addEventListener('click', function() {
             this.classList.add('btn-shake');
-            // 动画结束后移除类，保证多次点击都生效
             setTimeout(() => {
                 this.classList.remove('btn-shake');
-            }, 500); // 时间和动画时长（0.5s）保持一致
+            }, 500);
         });
 
-        // 窗口大小变化时，保持自适应
+        // 窗口适配
         window.addEventListener('resize', () => {
             if (imgUrl) {
                 resultImg.style.maxHeight = `${window.innerHeight}px`;
