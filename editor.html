@@ -13,24 +13,25 @@
             -webkit-tap-highlight-color: transparent;
         }
         body {
-            /* 浅蓝+浅粉+浅黄低饱和渐变背景 */
             background: linear-gradient(135deg, #f9f7fd, #f7f9fd, #fffbf0);
             min-height: 100vh;
-            /* 手机端增大上下内边距，避免拥挤 */
             padding: 25px 18px;
             display: flex;
             flex-direction: column;
             align-items: center;
             overflow-x: hidden;
+            /* 防止触摸事件溢出 */
+            touch-action: auto;
         }
         .container {
             max-width: 500px;
             width: 100%;
-            /* 手机端增加左右留白 */
             padding: 0 8px;
+            /* 确保容器层级低于按钮 */
+            position: relative;
+            z-index: 1;
         }
         h1 {
-            /* 浅粉主色 + 文字弥散阴影 */
             color: #e8869c;
             font-size: 22px;
             text-align: center;
@@ -40,11 +41,9 @@
         }
 
         .preview-card {
-            /* 弥散风卡片：玻璃拟态+浅色系阴影 */
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(12px);
             border-radius: 24px;
-            /* 增大内边距，避免拥挤 */
             padding: 20px;
             box-shadow: 
                 0 8px 24px rgba(186, 200, 255, 0.1),
@@ -52,14 +51,17 @@
             margin-bottom: 25px;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.8);
+            /* 防止遮挡按钮 */
+            z-index: 1;
         }
         .preview-img-wrap {
             position: relative;
             width: 100%;
             border-radius: 16px;
             overflow: hidden;
-            /* 图片容器增加圆角，更柔和 */
             box-shadow: 0 4px 15px rgba(184, 208, 255, 0.1);
+            /* 单独处理拖拽区域的触摸事件 */
+            touch-action: pan-y;
         }
         #previewImg {
             width: 100%;
@@ -77,7 +79,8 @@
             user-select: text;
             padding: 10px 16px;
             border-radius: 8px;
-            touch-action: none;
+            /* 仅允许文字拖拽，不阻止其他事件 */
+            touch-action: manipulation;
             white-space: pre-wrap;
             word-break: break-word;
             max-width: 90%;
@@ -85,10 +88,10 @@
             background: transparent;
             border: none;
             outline: none;
+            z-index: 2;
         }
         .polaroid-text {
             display: none;
-            /* 增大拍立得文字内边距 */
             padding: 20px 0;
             text-align: center;
             font-size: 22px;
@@ -107,19 +110,19 @@
         }
 
         .panel {
-            /* 弥散风控制面板 */
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(12px);
             border-radius: 24px;
-            /* 增大内边距，优化手机端拥挤问题 */
             padding: 24px 22px;
             box-shadow: 
                 0 6px 18px rgba(186, 200, 255, 0.08),
                 0 3px 8px rgba(255, 218, 230, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.8);
+            /* 确保面板层级，按钮可点击 */
+            position: relative;
+            z-index: 2;
         }
         .section {
-            /* 增大模块间距 */
             margin-bottom: 24px;
         }
         .section-title {
@@ -134,6 +137,9 @@
             align-items: center;
             justify-content: space-between;
             padding: 12px 0;
+            /* 确保toggle可点击 */
+            cursor: pointer;
+            touch-action: manipulation;
         }
         .toggle-label {
             font-size: 15px;
@@ -142,11 +148,12 @@
         .toggle-switch {
             width: 44px;
             height: 24px;
-            /* 浅色系开关默认色 */
             background: #e8f0fe;
             border-radius: 999px;
             position: relative;
             transition: background 0.2s;
+            /* 增大点击区域 */
+            touch-action: manipulation;
         }
         .toggle-switch::after {
             content: '';
@@ -161,7 +168,6 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .toggle-switch.active {
-            /* 浅蓝主色激活态 */
             background: #8ab4f8;
         }
         .toggle-switch.active::after {
@@ -171,23 +177,22 @@
         .slider-box {
             margin-top: 10px;
             width: 100%;
-            /* 增大滑块区域上下内边距 */
             padding: 12px 0;
         }
         .slider {
             width: 100%;
             height: 8px;
-            /* 浅蓝滑块渐变 */
             background: linear-gradient(to right, #8ab4f8 0%, #8ab4f8 50%, #f0f4f8 50%, #f0f4f8 100%);
             border-radius: 4px;
             -webkit-appearance: none;
             outline: none;
+            /* 滑块可交互 */
+            touch-action: manipulation;
         }
         .slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 24px;
             height: 24px;
-            /* 浅蓝滑块按钮 + 弥散阴影 */
             background: #8ab4f8;
             border-radius: 50%;
             cursor: pointer;
@@ -203,7 +208,6 @@
         .colors {
             display: flex;
             flex-wrap: wrap;
-            /* 增大颜色圆点间距 */
             gap: 12px;
             margin-top: 10px;
         }
@@ -215,17 +219,19 @@
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            /* 确保颜色点可点击 */
+            touch-action: manipulation;
         }
         .color-dot:hover {
             transform: scale(1.05);
             box-shadow: 0 2px 10px rgba(138, 180, 248, 0.2);
         }
         .color-dot.active {
-            /* 浅蓝激活边框 */
             outline: 3px solid #8ab4f8;
             outline-offset: 2px;
         }
-        /* 修复移动端颜色选择器样式 */
+        
+        /* 移动端颜色选择器核心修复 */
         .color-input-wrap {
             position: relative;
             width: 40px;
@@ -233,6 +239,8 @@
             border-radius: 50%;
             overflow: hidden;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
         .color-input {
             position: absolute;
@@ -241,13 +249,31 @@
             width: 100%;
             height: 100%;
             opacity: 0;
+            -webkit-appearance: none;
+            appearance: none;
             cursor: pointer;
-            /* 增大点击区域 */
+            z-index: 10;
+            /* 移动端增大点击区域 */
             width: 50px;
             height: 50px;
             top: -5px;
             left: -5px;
         }
+        .color-input-wrap::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            z-index: 1;
+            transition: transform 0.1s ease;
+        }
+        .color-input-wrap:active::after {
+            transform: scale(0.95);
+        }
+
         .color-row {
             display: flex;
             align-items: center;
@@ -277,14 +303,16 @@
             font-size: 16px;
             font-weight: 500;
             color: #fff;
-            /* 增大按钮间距 */
             margin-top: 15px;
             cursor: pointer;
             transition: 0.2s;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            /* 确保按钮可点击，最高层级 */
+            position: relative;
+            z-index: 10;
+            touch-action: manipulation;
         }
         .btn-back {
-            /* 浅蓝低饱和按钮（替换原来的深灰色） */
             background: #b8d0ff;
             color: #475569;
         }
@@ -293,7 +321,6 @@
             box-shadow: 0 6px 15px rgba(184, 208, 255, 0.2);
         }
         .btn-preview {
-            /* 浅粉+浅黄渐变按钮 */
             background: linear-gradient(135deg, #f8a8c1, #ffe0b5);
             color: #475569;
         }
@@ -304,7 +331,6 @@
 
         .radius-btn-group {
             display: flex;
-            /* 增大圆角按钮间距 */
             gap: 12px;
             margin-top: 12px;
         }
@@ -313,14 +339,14 @@
             padding: 10px 0;
             border-radius: 10px;
             border: 1px solid #e8f0fe;
-            /* 浅色系按钮背景 */
             background: #f9fafe;
             color: #374151;
             cursor: pointer;
             transition: 0.2s;
+            /* 确保按钮可点击 */
+            touch-action: manipulation;
         }
         .radius-btn.active {
-            /* 浅蓝激活态 */
             background: #8ab4f8;
             color: #fff;
             border-color: #8ab4f8;
@@ -331,7 +357,6 @@
             text-align: center;
             font-size: 12px;
             color: #9ca3af;
-            /* 增大提示文字上下间距 */
             margin: 18px 0 8px;
             line-height: 1.5;
         }
@@ -352,7 +377,7 @@
 
     <div class="panel">
         <div class="section">
-            <div class="toggle">
+            <div class="toggle" id="polaroidToggleWrap">
                 <div class="toggle-label">Display text below the image.</div>
                 <div class="toggle-switch" id="polaroidToggle"></div>
             </div>
@@ -389,8 +414,7 @@
                 <button class="color-dot" style="background:#707091" data-color="#707091"></button>
             </div>
             <div class="color-row">
-                <!-- 修复：添加颜色选择器包裹层 -->
-                <div class="color-input-wrap" style="background:#ffffff">
+                <div class="color-input-wrap" id="textColorWrap" style="background:#ffffff">
                     <input type="color" id="customTextColor" class="color-input" value="#ffffff">
                 </div>
                 <span class="color-tip">Custom Text Color</span>
@@ -398,7 +422,7 @@
         </div>
 
         <div class="section">
-            <div class="toggle">
+            <div class="toggle" id="bgToggleWrap">
                 <div class="toggle-label">Text background box</div>
                 <div class="toggle-switch" id="bgToggle"></div>
             </div>
@@ -416,8 +440,7 @@
 <button class="color-dot" style="background:#b1b1b1" data-color="#b1b1b1"></button>
                 </div>
                 <div class="color-row">
-                    <!-- 修复：添加颜色选择器包裹层 -->
-                    <div class="color-input-wrap" style="background:#4263eb">
+                    <div class="color-input-wrap" id="bgColorWrap" style="background:#4263eb">
                         <input type="color" id="customBgColor" class="color-input" value="#4263eb">
                     </div>
                     <span class="color-tip">Custom Background Color</span>
@@ -444,25 +467,24 @@
         </div>
 
         <div class="section">
-            <div class="toggle">
+            <div class="toggle" id="shadowToggleWrap">
                 <div class="toggle-label">Text Shadow</div>
                 <div class="toggle-switch" id="shadowToggle"></div>
             </div>
             <div class="collapse" id="shadowPanel">
                 <div class="colors" id="shadowColors">
-                    <button class="color-dot active" style="background:#333333" data-color="#333333"></button> <!-- 深灰（万能款） -->
-<button class="color-dot" style="background:#000000" data-color="#000000"></button> <!-- 纯黑（强对比） -->
-<button class="color-dot" style="background:#666666" data-color="#666666"></button> <!-- 中灰（柔和） -->
-<button class="color-dot" style="background:#222244" data-color="#222244"></button> <!-- 深蓝灰（冷调） -->
-<button class="color-dot" style="background:#442222" data-color="#442222"></button> <!-- 深红棕（暖调） -->
-<button class="color-dot" style="background:#224422" data-color="#224422"></button> <!-- 深绿灰（森系） -->
-<button class="color-dot" style="background:#443322" data-color="#443322"></button> <!-- 深棕黄（复古） -->
-<button class="color-dot" style="background:#ffffff" data-color="#ffffff"></button> <!-- 纯白（深色背景） -->
-<button class="color-dot" style="background:#888888" data-color="#888888"></button> <!-- 浅灰（低对比） -->
+                    <button class="color-dot active" style="background:#333333" data-color="#333333"></button>
+<button class="color-dot" style="background:#000000" data-color="#000000"></button>
+<button class="color-dot" style="background:#666666" data-color="#666666"></button>
+<button class="color-dot" style="background:#222244" data-color="#222244"></button>
+<button class="color-dot" style="background:#442222" data-color="#442222"></button>
+<button class="color-dot" style="background:#224422" data-color="#224422"></button>
+<button class="color-dot" style="background:#443322" data-color="#443322"></button>
+<button class="color-dot" style="background:#ffffff" data-color="#ffffff"></button>
+<button class="color-dot" style="background:#888888" data-color="#888888"></button>
                 </div>
                 <div class="color-row">
-                    <!-- 修复：添加颜色选择器包裹层 -->
-                    <div class="color-input-wrap" style="background:#000000">
+                    <div class="color-input-wrap" id="shadowColorWrap" style="background:#000000">
                         <input type="color" id="customShadowColor" class="color-input" value="#000000">
                     </div>
                     <span class="color-tip">Custom Shadow Color</span>
@@ -471,25 +493,24 @@
         </div>
 
         <div class="section">
-            <div class="toggle">
+            <div class="toggle" id="glowToggleWrap">
                 <div class="toggle-label">Text Outer Glow</div>
                 <div class="toggle-switch" id="glowToggle"></div>
             </div>
             <div class="collapse" id="glowPanel">
                 <div class="colors" id="glowColors">
-                    <button class="color-dot active" style="background:#ffffff" data-color="#ffffff"></button> <!-- 纯白（万能款） -->
-<button class="color-dot" style="background:#eeeeee" data-color="#eeeeee"></button> <!-- 浅灰（超柔和） -->
-<button class="color-dot" style="background:#ffdddd" data-color="#ffdddd"></button> <!-- 浅粉（温馨） -->
-<button class="color-dot" style="background:#ddffdd" data-color="#ddffdd"></button> <!-- 浅绿（清新） -->
-<button class="color-dot" style="background:#ddddff" data-color="#ddddff"></button> <!-- 浅蓝（清冷） -->
-<button class="color-dot" style="background:#fff0dd" data-color="#fff0dd"></button> <!-- 浅橙（暖调） -->
-<button class="color-dot" style="background:#f0ddff" data-color="#f0ddff"></button> <!-- 浅紫（梦幻） -->
-<button class="color-dot" style="background:#ddfff0" data-color="#ddfff0"></button> <!-- 浅青（治愈） -->
-<button class="color-dot" style="background:#000000" data-color="#000000"></button> <!-- 纯黑（深色文字用） -->
+                    <button class="color-dot active" style="background:#ffffff" data-color="#ffffff"></button>
+<button class="color-dot" style="background:#eeeeee" data-color="#eeeeee"></button>
+<button class="color-dot" style="background:#ffdddd" data-color="#ffdddd"></button>
+<button class="color-dot" style="background:#ddffdd" data-color="#ddffdd"></button>
+<button class="color-dot" style="background:#ddddff" data-color="#ddddff"></button>
+<button class="color-dot" style="background:#fff0dd" data-color="#fff0dd"></button>
+<button class="color-dot" style="background:#f0ddff" data-color="#f0ddff"></button>
+<button class="color-dot" style="background:#ddfff0" data-color="#ddfff0"></button>
+<button class="color-dot" style="background:#000000" data-color="#000000"></button>
                 </div>
                 <div class="color-row">
-                    <!-- 修复：添加颜色选择器包裹层 -->
-                    <div class="color-input-wrap" style="background:#ffffff">
+                    <div class="color-input-wrap" id="glowColorWrap" style="background:#ffffff">
                         <input type="color" id="customGlowColor" class="color-input" value="#ffffff">
                     </div>
                     <span class="color-tip">Custom Outer Glow Color</span>
@@ -505,432 +526,487 @@
 </div>
 
 <script>
-    const imgUrl = localStorage.getItem('nfcImage');
-    const textContent = localStorage.getItem('nfcText') || '';
-    const savedStyle = JSON.parse(localStorage.getItem('nfcTextStyle') || '{}');
-    if (!imgUrl) window.location.href = './index.html';
-
-    const previewImg = document.getElementById('previewImg');
-    const draggableText = document.getElementById('draggableText');
-    const polaroidText = document.getElementById('polaroidText');
-    const polaroidToggle = document.getElementById('polaroidToggle');
-    const fontSizeSlider = document.getElementById('fontSizeSlider');
-    const sizeNum = document.getElementById('sizeNum');
-
-    const bgToggle = document.getElementById('bgToggle');
-    const shadowToggle = document.getElementById('shadowToggle');
-    const glowToggle = document.getElementById('glowToggle');
-
-    previewImg.src = imgUrl;
-    draggableText.textContent = textContent;
-    polaroidText.textContent = textContent;
-
-    function isPolaroidOn() {
-        return polaroidToggle.classList.contains('active');
-    }
-
-    function initSavedStyle() {
-        if (savedStyle.isPolaroid) {
-            polaroidToggle.classList.add('active');
-            draggableText.style.display = 'none';
-            polaroidText.classList.add('show');
-        }
-
-        if (savedStyle.fontSize) {
-            fontSizeSlider.value = savedStyle.fontSize;
-            sizeNum.textContent = savedStyle.fontSize;
-            draggableText.style.fontSize = `${savedStyle.fontSize}px`;
-            polaroidText.style.fontSize = `${savedStyle.fontSize}px`;
-        }
-
-        if (savedStyle.color) {
-            draggableText.style.color = savedStyle.color;
-            polaroidText.style.color = savedStyle.color;
-            const textColorDot = Array.from(document.querySelectorAll('#textColors .color-dot')).find(d => d.dataset.color === savedStyle.color);
-            if (textColorDot) {
-                document.querySelectorAll('#textColors .color-dot').forEach(d => d.classList.remove('active'));
-                textColorDot.classList.add('active');
-                document.getElementById('customTextColor').value = savedStyle.color;
-                // 同步颜色选择器背景
-                document.querySelector('#customTextColor').parentElement.style.background = savedStyle.color;
-            }
-        }
-
-        if (savedStyle.bg) {
-            bgToggle.classList.add('active');
-            document.getElementById('bgPanel').classList.add('show');
-            // 强制重新计算背景样式，避免样式丢失
-            updateBgStyle(true);
-        }
-
-        if (savedStyle.textShadow && savedStyle.textShadow.includes('0 2px 6px')) {
-            shadowToggle.classList.add('active');
-            document.getElementById('shadowPanel').classList.add('show');
-            const shadowColor = savedStyle.textShadow.match(/#[0-9a-fA-F]{6}/)?.[0] || '#000000';
-            const shadowDot = Array.from(document.querySelectorAll('#shadowColors .color-dot')).find(d => d.dataset.color === shadowColor);
-            if (shadowDot) {
-                document.querySelectorAll('#shadowColors .color-dot').forEach(d => d.classList.remove('active'));
-                shadowDot.classList.add('active');
-            }
-            document.getElementById('customShadowColor').value = shadowColor;
-            document.querySelector('#customShadowColor').parentElement.style.background = shadowColor;
-        }
-
-        if (savedStyle.textShadow && savedStyle.textShadow.includes('0 0 20px')) {
-            glowToggle.classList.add('active');
-            document.getElementById('glowPanel').classList.add('show');
-            const glowColor = savedStyle.textShadow.match(/#[0-9a-fA-F]{6}/)?.[0] || '#ffffff';
-            const glowDot = Array.from(document.querySelectorAll('#glowColors .color-dot')).find(d => d.dataset.color === glowColor);
-            if (glowDot) {
-                document.querySelectorAll('#glowColors .color-dot').forEach(d => d.classList.remove('active'));
-                glowDot.classList.add('active');
-            }
-            document.getElementById('customGlowColor').value = glowColor;
-            document.querySelector('#customGlowColor').parentElement.style.background = glowColor;
-        }
-
-        if (savedStyle.left && savedStyle.top) {
-            draggableText.style.left = savedStyle.left;
-            draggableText.style.top = savedStyle.top;
-            draggableText.style.transform = 'none';
-        }
-
-        updateSliderStyle(fontSizeSlider);
-        updateSliderStyle(document.getElementById('bgPadding'));
-        updateSliderStyle(document.getElementById('bgOpacity'));
-        updateTextEffect();
-    }
-
-    initSavedStyle();
-
-    polaroidToggle.addEventListener('click', () => {
-        polaroidToggle.classList.toggle('active');
-        const on = isPolaroidOn();
-        draggableText.style.display = on ? 'none' : 'block';
-        polaroidText.classList.toggle('show', on);
+    // ========== 核心修复1：DOM加载完成后再执行所有逻辑 ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        // 安全读取localStorage，防止解析报错
+        let imgUrl = '';
+        let textContent = '';
+        let savedStyle = {};
         
-        // 修复：无论开关状态，都重新同步样式
-        if (bgToggle.classList.contains('active')) {
-            updateBgStyle(true);
-        } else {
-            // 确保关闭时样式正确重置
-            draggableText.style.background = 'transparent';
-            draggableText.style.padding = '10px 16px';
-            draggableText.style.borderRadius = '8px';
-            polaroidText.style.background = 'transparent';
-            polaroidText.style.padding = on ? '20px 0' : '0';
-            polaroidText.style.borderRadius = '0';
+        try {
+            imgUrl = localStorage.getItem('nfcImage') || '';
+            textContent = localStorage.getItem('nfcText') || '';
+            savedStyle = JSON.parse(localStorage.getItem('nfcTextStyle') || '{}');
+        } catch (e) {
+            console.log('读取本地存储数据失败:', e);
+            savedStyle = {};
         }
-    });
 
-    draggableText.addEventListener('input', () => {
-        polaroidText.textContent = draggableText.textContent;
-        localStorage.setItem('nfcText', draggableText.textContent);
-    });
-    polaroidText.addEventListener('input', () => {
-        draggableText.textContent = polaroidText.textContent;
-        localStorage.setItem('nfcText', polaroidText.textContent);
-    });
-
-    function updateSliderStyle(slider) {
-        const val = (slider.value - slider.min) / (slider.max - slider.min) * 100;
-        // 滑块渐变改为浅蓝主色
-        slider.style.background = `linear-gradient(to right, #8ab4f8 0%, #8ab4f8 ${val}%, #f0f4f8 ${val}%, #f0f4f8 100%)`;
-    }
-
-    fontSizeSlider.addEventListener('input', () => {
-        const size = fontSizeSlider.value;
-        sizeNum.textContent = size;
-        draggableText.style.fontSize = `${size}px`;
-        polaroidText.style.fontSize = `${size}px`;
-        updateSliderStyle(fontSizeSlider);
-    });
-
-    const textColorDots = document.querySelectorAll('#textColors .color-dot');
-    const customTextColor = document.getElementById('customTextColor');
-
-    textColorDots.forEach(dot => {
-        dot.addEventListener('click', () => {
-            textColorDots.forEach(d => d.classList.remove('active'));
-            dot.classList.add('active');
-            const color = dot.dataset.color;
-            draggableText.style.color = color;
-            polaroidText.style.color = color;
-            customTextColor.value = color;
-            // 同步颜色选择器背景
-            customTextColor.parentElement.style.background = color;
-        });
-    });
-
-    customTextColor.addEventListener('input', () => {
-        textColorDots.forEach(d => d.classList.remove('active'));
-        const color = customTextColor.value;
-        draggableText.style.color = color;
-        polaroidText.style.color = color;
-        // 同步颜色选择器背景
-        customTextColor.parentElement.style.background = color;
-    });
-
-    const bgPanel = document.getElementById('bgPanel');
-    const bgColorDots = document.querySelectorAll('#bgColors .color-dot');
-    const customBgColor = document.getElementById('customBgColor');
-    const bgPadding = document.getElementById('bgPadding');
-    const bgPaddingNum = document.getElementById('bgPaddingNum');
-    const bgOpacity = document.getElementById('bgOpacity');
-    const bgOpacityNum = document.getElementById('bgOpacityNum');
-    const radiusBtns = document.querySelectorAll('.radius-btn');
-
-    bgToggle.addEventListener('click', () => {
-        bgToggle.classList.toggle('active');
-        bgPanel.classList.toggle('show', bgToggle.classList.contains('active'));
-        // 修复：强制更新背景样式，确保状态同步
-        updateBgStyle(true);
-    });
-
-    bgColorDots.forEach(dot => {
-        dot.addEventListener('click', () => {
-            bgColorDots.forEach(d => d.classList.remove('active'));
-            dot.classList.add('active');
-            customBgColor.value = dot.dataset.color;
-            // 同步颜色选择器背景
-            customBgColor.parentElement.style.background = dot.dataset.color;
-            updateBgStyle();
-        });
-    });
-
-    customBgColor.addEventListener('input', () => {
-        bgColorDots.forEach(d => d.classList.remove('active'));
-        // 同步颜色选择器背景
-        customBgColor.parentElement.style.background = customBgColor.value;
-        updateBgStyle();
-    });
-
-    bgPadding.addEventListener('input', () => {
-        const padding = bgPadding.value;
-        bgPaddingNum.textContent = padding;
-        updateSliderStyle(bgPadding);
-        updateBgStyle();
-    });
-
-    bgOpacity.addEventListener('input', () => {
-        const opacity = bgOpacity.value;
-        bgOpacityNum.textContent = opacity;
-        updateSliderStyle(bgOpacity);
-        updateBgStyle();
-    });
-
-    radiusBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            radiusBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            updateBgStyle();
-        });
-    });
-
-    // 修复：增加强制更新参数，确保样式重新计算
-    function updateBgStyle(forceUpdate = false) {
-        // 如果背景开关未激活，重置样式
-        if (!bgToggle.classList.contains('active') && !forceUpdate) {
-            draggableText.style.background = 'transparent';
-            draggableText.style.padding = '10px 16px';
-            draggableText.style.borderRadius = '8px';
-            
-            polaroidText.style.background = 'transparent';
-            polaroidText.style.padding = isPolaroidOn() ? '20px 0' : '0';
-            polaroidText.style.borderRadius = '0';
+        // 无图片则跳转，防止页面卡死
+        if (!imgUrl) {
+            window.location.href = './index.html';
             return;
         }
 
-        // 强制获取最新值，避免使用缓存
-        const color = document.querySelector('#bgColors .active')?.dataset.color || customBgColor.value;
-        const opacity = bgOpacity.value / 100;
-        const padding = bgPadding.value;
-        const radius = document.querySelector('.radius-btn.active').dataset.radius;
-        const rgbaColor = `${color}${Math.floor(opacity * 255).toString(16).padStart(2, '0')}`;
+        // ========== 获取所有DOM元素 ==========
+        const previewImg = document.getElementById('previewImg');
+        const draggableText = document.getElementById('draggableText');
+        const polaroidText = document.getElementById('polaroidText');
+        const polaroidToggleWrap = document.getElementById('polaroidToggleWrap');
+        const polaroidToggle = document.getElementById('polaroidToggle');
+        const fontSizeSlider = document.getElementById('fontSizeSlider');
+        const sizeNum = document.getElementById('sizeNum');
 
-        // 更新拖拽文字样式
-        draggableText.style.background = rgbaColor;
-        draggableText.style.padding = `${padding}px ${padding * 1.6}px`;
-        draggableText.style.borderRadius = `${radius}px`;
+        const bgToggleWrap = document.getElementById('bgToggleWrap');
+        const bgToggle = document.getElementById('bgToggle');
+        const shadowToggleWrap = document.getElementById('shadowToggleWrap');
+        const shadowToggle = document.getElementById('shadowToggle');
+        const glowToggleWrap = document.getElementById('glowToggleWrap');
+        const glowToggle = document.getElementById('glowToggle');
 
-        // 更新拍立得文字样式
-        if (isPolaroidOn()) {
-            polaroidText.style.background = rgbaColor;
-            polaroidText.style.padding = `${padding}px ${padding * 1.6}px`;
-            polaroidText.style.borderRadius = `${radius}px`;
-            polaroidText.style.display = 'block';
-            polaroidText.style.margin = '0 auto';
-        } else {
-            polaroidText.style.background = 'transparent';
-            polaroidText.style.padding = '0';
-            polaroidText.style.borderRadius = '0';
+        const bgPanel = document.getElementById('bgPanel');
+        const bgColorDots = document.querySelectorAll('#bgColors .color-dot');
+        const customBgColor = document.getElementById('customBgColor');
+        const bgPadding = document.getElementById('bgPadding');
+        const bgPaddingNum = document.getElementById('bgPaddingNum');
+        const bgOpacity = document.getElementById('bgOpacity');
+        const bgOpacityNum = document.getElementById('bgOpacityNum');
+        const radiusBtns = document.querySelectorAll('.radius-btn');
+
+        const textColorDots = document.querySelectorAll('#textColors .color-dot');
+        const customTextColor = document.getElementById('customTextColor');
+        const shadowPanel = document.getElementById('shadowPanel');
+        const shadowColorDots = document.querySelectorAll('#shadowColors .color-dot');
+        const customShadowColor = document.getElementById('customShadowColor');
+        const glowPanel = document.getElementById('glowPanel');
+        const glowColorDots = document.querySelectorAll('#glowColors .color-dot');
+        const customGlowColor = document.getElementById('customGlowColor');
+
+        const backBtn = document.getElementById('backBtn');
+        const previewBtn = document.getElementById('previewBtn');
+
+        // ========== 初始化页面 ==========
+        previewImg.src = imgUrl;
+        draggableText.textContent = textContent;
+        polaroidText.textContent = textContent;
+
+        // 判断拍立得模式
+        function isPolaroidOn() {
+            return polaroidToggle.classList.contains('active');
         }
-    }
 
-    const shadowPanel = document.getElementById('shadowPanel');
-    const shadowColorDots = document.querySelectorAll('#shadowColors .color-dot');
-    const customShadowColor = document.getElementById('customShadowColor');
-    const glowPanel = document.getElementById('glowPanel');
-    const glowColorDots = document.querySelectorAll('#glowColors .color-dot');
-    const customGlowColor = document.getElementById('customGlowColor');
+        // 初始化保存的样式
+        function initSavedStyle() {
+            try {
+                if (savedStyle.isPolaroid) {
+                    polaroidToggle.classList.add('active');
+                    draggableText.style.display = 'none';
+                    polaroidText.classList.add('show');
+                }
 
-    shadowToggle.addEventListener('click', () => {
-        shadowToggle.classList.toggle('active');
-        shadowPanel.classList.toggle('show', shadowToggle.classList.contains('active'));
-        updateTextEffect();
-    });
+                if (savedStyle.fontSize) {
+                    fontSizeSlider.value = savedStyle.fontSize;
+                    sizeNum.textContent = savedStyle.fontSize;
+                    draggableText.style.fontSize = `${savedStyle.fontSize}px`;
+                    polaroidText.style.fontSize = `${savedStyle.fontSize}px`;
+                }
 
-    shadowColorDots.forEach(dot => {
-        dot.addEventListener('click', () => {
+                if (savedStyle.color) {
+                    draggableText.style.color = savedStyle.color;
+                    polaroidText.style.color = savedStyle.color;
+                    const textColorDot = Array.from(textColorDots).find(d => d.dataset.color === savedStyle.color);
+                    if (textColorDot) {
+                        textColorDots.forEach(d => d.classList.remove('active'));
+                        textColorDot.classList.add('active');
+                        customTextColor.value = savedStyle.color;
+                        document.getElementById('textColorWrap').style.background = savedStyle.color;
+                    }
+                }
+
+                if (savedStyle.bg) {
+                    bgToggle.classList.add('active');
+                    bgPanel.classList.add('show');
+                    updateBgStyle(true);
+                }
+
+                if (savedStyle.textShadow && savedStyle.textShadow.includes('0 2px 6px')) {
+                    shadowToggle.classList.add('active');
+                    shadowPanel.classList.add('show');
+                    const shadowColor = savedStyle.textShadow.match(/#[0-9a-fA-F]{6}/)?.[0] || '#000000';
+                    const shadowDot = Array.from(shadowColorDots).find(d => d.dataset.color === shadowColor);
+                    if (shadowDot) {
+                        shadowColorDots.forEach(d => d.classList.remove('active'));
+                        shadowDot.classList.add('active');
+                    }
+                    customShadowColor.value = shadowColor;
+                    document.getElementById('shadowColorWrap').style.background = shadowColor;
+                }
+
+                if (savedStyle.textShadow && savedStyle.textShadow.includes('0 0 20px')) {
+                    glowToggle.classList.add('active');
+                    glowPanel.classList.add('show');
+                    const glowColor = savedStyle.textShadow.match(/#[0-9a-fA-F]{6}/)?.[0] || '#ffffff';
+                    const glowDot = Array.from(glowColorDots).find(d => d.dataset.color === glowColor);
+                    if (glowDot) {
+                        glowColorDots.forEach(d => d.classList.remove('active'));
+                        glowDot.classList.add('active');
+                    }
+                    customGlowColor.value = glowColor;
+                    document.getElementById('glowColorWrap').style.background = glowColor;
+                }
+
+                if (savedStyle.left && savedStyle.top) {
+                    draggableText.style.left = savedStyle.left;
+                    draggableText.style.top = savedStyle.top;
+                    draggableText.style.transform = 'none';
+                }
+
+                updateSliderStyle(fontSizeSlider);
+                updateSliderStyle(bgPadding);
+                updateSliderStyle(bgOpacity);
+                updateTextEffect();
+            } catch (e) {
+                console.log('初始化样式失败:', e);
+            }
+        }
+
+        // ========== 工具函数 ==========
+        function updateSliderStyle(slider) {
+            if (!slider) return;
+            const val = (slider.value - slider.min) / (slider.max - slider.min) * 100;
+            slider.style.background = `linear-gradient(to right, #8ab4f8 0%, #8ab4f8 ${val}%, #f0f4f8 ${val}%, #f0f4f8 100%)`;
+        }
+
+        function updateBgStyle(forceUpdate = false) {
+            if (!bgToggle) return;
+            if (!bgToggle.classList.contains('active') && !forceUpdate) {
+                draggableText.style.background = 'transparent';
+                draggableText.style.padding = '10px 16px';
+                draggableText.style.borderRadius = '8px';
+                
+                polaroidText.style.background = 'transparent';
+                polaroidText.style.padding = isPolaroidOn() ? '20px 0' : '0';
+                polaroidText.style.borderRadius = '0';
+                return;
+            }
+
+            const color = document.querySelector('#bgColors .active')?.dataset.color || customBgColor.value;
+            const opacity = bgOpacity.value / 100;
+            const padding = bgPadding.value;
+            const radius = document.querySelector('.radius-btn.active')?.dataset.radius || '8';
+            const rgbaColor = `${color}${Math.floor(opacity * 255).toString(16).padStart(2, '0')}`;
+
+            draggableText.style.background = rgbaColor;
+            draggableText.style.padding = `${padding}px ${padding * 1.6}px`;
+            draggableText.style.borderRadius = `${radius}px`;
+
+            if (isPolaroidOn()) {
+                polaroidText.style.background = rgbaColor;
+                polaroidText.style.padding = `${padding}px ${padding * 1.6}px`;
+                polaroidText.style.borderRadius = `${radius}px`;
+                polaroidText.style.display = 'block';
+                polaroidText.style.margin = '0 auto';
+            } else {
+                polaroidText.style.background = 'transparent';
+                polaroidText.style.padding = '0';
+                polaroidText.style.borderRadius = '0';
+            }
+        }
+
+        function updateTextEffect() {
+            let shadowStyle = '';
+            let glowStyle = '';
+
+            if (shadowToggle.classList.contains('active')) {
+                const shadowColor = document.querySelector('#shadowColors .active')?.dataset.color || customShadowColor.value;
+                shadowStyle = `0 2px 6px ${shadowColor}80`;
+            }
+
+            if (glowToggle.classList.contains('active')) {
+                const glowColor = document.querySelector('#glowColors .active')?.dataset.color || customGlowColor.value;
+                glowStyle = `0 0 20px ${glowColor}ff, 0 0 30px ${glowColor}80`;
+            }
+
+            const finalStyle = [shadowStyle, glowStyle].filter(Boolean).join(', ');
+            draggableText.style.textShadow = finalStyle || 'none';
+            polaroidText.style.textShadow = finalStyle || 'none';
+        }
+
+        // ========== 事件绑定 ==========
+        // 修复2：绑定toggle到外层容器，防止点击不到
+        polaroidToggleWrap.addEventListener('click', function(e) {
+            if (e.target === polaroidToggle || e.target === this) {
+                polaroidToggle.classList.toggle('active');
+                const on = isPolaroidOn();
+                draggableText.style.display = on ? 'none' : 'block';
+                polaroidText.classList.toggle('show', on);
+                
+                if (bgToggle.classList.contains('active')) {
+                    updateBgStyle(true);
+                } else {
+                    draggableText.style.background = 'transparent';
+                    draggableText.style.padding = '10px 16px';
+                    draggableText.style.borderRadius = '8px';
+                    polaroidText.style.background = 'transparent';
+                    polaroidText.style.padding = on ? '20px 0' : '0';
+                    polaroidText.style.borderRadius = '0';
+                }
+            }
+        });
+
+        bgToggleWrap.addEventListener('click', function(e) {
+            if (e.target === bgToggle || e.target === this) {
+                bgToggle.classList.toggle('active');
+                bgPanel.classList.toggle('show', bgToggle.classList.contains('active'));
+                updateBgStyle(true);
+            }
+        });
+
+        shadowToggleWrap.addEventListener('click', function(e) {
+            if (e.target === shadowToggle || e.target === this) {
+                shadowToggle.classList.toggle('active');
+                shadowPanel.classList.toggle('show', shadowToggle.classList.contains('active'));
+                updateTextEffect();
+            }
+        });
+
+        glowToggleWrap.addEventListener('click', function(e) {
+            if (e.target === glowToggle || e.target === this) {
+                glowToggle.classList.toggle('active');
+                glowPanel.classList.toggle('show', glowToggle.classList.contains('active'));
+                updateTextEffect();
+            }
+        });
+
+        // 文字编辑同步
+        draggableText.addEventListener('input', function() {
+            polaroidText.textContent = this.textContent;
+            localStorage.setItem('nfcText', this.textContent);
+        });
+        polaroidText.addEventListener('input', function() {
+            draggableText.textContent = this.textContent;
+            localStorage.setItem('nfcText', this.textContent);
+        });
+
+        // 字体大小滑块
+        fontSizeSlider.addEventListener('input', function() {
+            const size = this.value;
+            sizeNum.textContent = size;
+            draggableText.style.fontSize = `${size}px`;
+            polaroidText.style.fontSize = `${size}px`;
+            updateSliderStyle(this);
+        });
+
+        // 文字颜色选择
+        textColorDots.forEach(dot => {
+            dot.addEventListener('click', function() {
+                textColorDots.forEach(d => d.classList.remove('active'));
+                this.classList.add('active');
+                const color = this.dataset.color;
+                draggableText.style.color = color;
+                polaroidText.style.color = color;
+                customTextColor.value = color;
+                document.getElementById('textColorWrap').style.background = color;
+            });
+        });
+
+        customTextColor.addEventListener('input', function() {
+            textColorDots.forEach(d => d.classList.remove('active'));
+            const color = this.value;
+            draggableText.style.color = color;
+            polaroidText.style.color = color;
+            document.getElementById('textColorWrap').style.background = color;
+        });
+
+        // 背景颜色选择
+        bgColorDots.forEach(dot => {
+            dot.addEventListener('click', function() {
+                bgColorDots.forEach(d => d.classList.remove('active'));
+                this.classList.add('active');
+                customBgColor.value = this.dataset.color;
+                document.getElementById('bgColorWrap').style.background = this.dataset.color;
+                updateBgStyle();
+            });
+        });
+
+        customBgColor.addEventListener('input', function() {
+            bgColorDots.forEach(d => d.classList.remove('active'));
+            document.getElementById('bgColorWrap').style.background = this.value;
+            updateBgStyle();
+        });
+
+        // 背景内边距
+        bgPadding.addEventListener('input', function() {
+            const padding = this.value;
+            bgPaddingNum.textContent = padding;
+            updateSliderStyle(this);
+            updateBgStyle();
+        });
+
+        // 背景透明度
+        bgOpacity.addEventListener('input', function() {
+            const opacity = this.value;
+            bgOpacityNum.textContent = opacity;
+            updateSliderStyle(this);
+            updateBgStyle();
+        });
+
+        // 圆角按钮
+        radiusBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                radiusBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                updateBgStyle();
+            });
+        });
+
+        // 阴影颜色选择
+        shadowColorDots.forEach(dot => {
+            dot.addEventListener('click', function() {
+                shadowColorDots.forEach(d => d.classList.remove('active'));
+                this.classList.add('active');
+                customShadowColor.value = this.dataset.color;
+                document.getElementById('shadowColorWrap').style.background = this.dataset.color;
+                updateTextEffect();
+            });
+        });
+
+        customShadowColor.addEventListener('input', function() {
             shadowColorDots.forEach(d => d.classList.remove('active'));
-            dot.classList.add('active');
-            customShadowColor.value = dot.dataset.color;
-            // 同步颜色选择器背景
-            customShadowColor.parentElement.style.background = dot.dataset.color;
+            document.getElementById('shadowColorWrap').style.background = this.value;
             updateTextEffect();
         });
-    });
 
-    customShadowColor.addEventListener('input', () => {
-        shadowColorDots.forEach(d => d.classList.remove('active'));
-        // 同步颜色选择器背景
-        customShadowColor.parentElement.style.background = customShadowColor.value;
-        updateTextEffect();
-    });
+        // 外发光颜色选择
+        glowColorDots.forEach(dot => {
+            dot.addEventListener('click', function() {
+                glowColorDots.forEach(d => d.classList.remove('active'));
+                this.classList.add('active');
+                customGlowColor.value = this.dataset.color;
+                document.getElementById('glowColorWrap').style.background = this.dataset.color;
+                updateTextEffect();
+            });
+        });
 
-    glowToggle.addEventListener('click', () => {
-        glowToggle.classList.toggle('active');
-        glowPanel.classList.toggle('show', glowToggle.classList.contains('active'));
-        updateTextEffect();
-    });
-
-    glowColorDots.forEach(dot => {
-        dot.addEventListener('click', () => {
+        customGlowColor.addEventListener('input', function() {
             glowColorDots.forEach(d => d.classList.remove('active'));
-            dot.classList.add('active');
-            customGlowColor.value = dot.dataset.color;
-            // 同步颜色选择器背景
-            customGlowColor.parentElement.style.background = dot.dataset.color;
+            document.getElementById('glowColorWrap').style.background = this.value;
             updateTextEffect();
         });
-    });
 
-    customGlowColor.addEventListener('input', () => {
-        glowColorDots.forEach(d => d.classList.remove('active'));
-        // 同步颜色选择器背景
-        customGlowColor.parentElement.style.background = customGlowColor.value;
-        updateTextEffect();
-    });
+        // ========== 拖拽功能（修复3：防止阻止按钮点击） ==========
+        let isDragging = false;
+        let offsetX = 0, offsetY = 0;
 
-    function updateTextEffect() {
-        let shadowStyle = '';
-        let glowStyle = '';
+        // PC端拖拽
+        draggableText.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            const rect = this.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+            this.style.zIndex = 10;
+            e.stopPropagation(); // 防止冒泡到父容器
+        });
 
-        if (shadowToggle.classList.contains('active')) {
-            const shadowColor = document.querySelector('#shadowColors .active')?.dataset.color || customShadowColor.value;
-            shadowStyle = `0 2px 6px ${shadowColor}80`;
+        document.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            const containerRect = document.getElementById('imgContainer').getBoundingClientRect();
+            let x = e.clientX - containerRect.left - offsetX;
+            let y = e.clientY - containerRect.top - offsetY;
+            x = Math.max(0, Math.min(x, containerRect.width - draggableText.offsetWidth));
+            y = Math.max(0, Math.min(y, containerRect.height - draggableText.offsetHeight));
+            draggableText.style.left = `${x}px`;
+            draggableText.style.top = `${y}px`;
+            draggableText.style.transform = 'none';
+        });
+
+        document.addEventListener('mouseup', function() {
+            if (isDragging) {
+                isDragging = false;
+                draggableText.style.zIndex = 1;
+            }
+        });
+
+        // 移动端拖拽（修复4：移除preventDefault，防止阻止点击）
+        draggableText.addEventListener('touchstart', function(e) {
+            isDragging = true;
+            const touch = e.touches[0];
+            const rect = this.getBoundingClientRect();
+            offsetX = touch.clientX - rect.left;
+            offsetY = touch.clientY - rect.top;
+            e.stopPropagation(); // 仅阻止冒泡，不阻止默认行为
+        });
+
+        document.addEventListener('touchmove', function(e) {
+            if (!isDragging) return;
+            const touch = e.touches[0];
+            const containerRect = document.getElementById('imgContainer').getBoundingClientRect();
+            let x = touch.clientX - containerRect.left - offsetX;
+            let y = touch.clientY - containerRect.top - offsetY;
+            x = Math.max(0, Math.min(x, containerRect.width - draggableText.offsetWidth));
+            y = Math.max(0, Math.min(y, containerRect.height - draggableText.offsetHeight));
+            draggableText.style.left = `${x}px`;
+            draggableText.style.top = `${y}px`;
+            draggableText.style.transform = 'none';
+            // 仅在拖拽时阻止默认行为，避免影响按钮
+            e.preventDefault();
+        });
+
+        document.addEventListener('touchend', function() {
+            if (isDragging) {
+                isDragging = false;
+            }
+        });
+
+        // ========== 按钮事件（修复5：确保按钮可点击） ==========
+        backBtn.addEventListener('click', function() {
+            window.location.href = './upload.html';
+        });
+
+        previewBtn.addEventListener('click', function() {
+            try {
+                const styleData = {
+                    fontSize: fontSizeSlider.value,
+                    color: draggableText.style.color,
+                    bg: draggableText.style.background,
+                    bgPadding: bgPadding.value,
+                    bgRadius: document.querySelector('.radius-btn.active')?.dataset.radius || '8',
+                    textShadow: draggableText.style.textShadow,
+                    isPolaroid: isPolaroidOn(),
+                    left: draggableText.style.left,
+                    top: draggableText.style.top,
+                    text: draggableText.textContent
+                };
+                localStorage.setItem('nfcTextStyle', JSON.stringify(styleData));
+                window.location.href = './index.html';
+            } catch (e) {
+                console.log('保存样式失败:', e);
+                window.location.href = './index.html';
+            }
+        });
+
+        // ========== 颜色选择器初始化 ==========
+        function initColorPickerBg() {
+            document.getElementById('textColorWrap').style.background = customTextColor.value;
+            document.getElementById('bgColorWrap').style.background = customBgColor.value;
+            document.getElementById('shadowColorWrap').style.background = customShadowColor.value;
+            document.getElementById('glowColorWrap').style.background = customGlowColor.value;
         }
 
-        // 修复：增强外发光效果，增大模糊半径和透明度
-        if (glowToggle.classList.contains('active')) {
-            const glowColor = document.querySelector('#glowColors .active')?.dataset.color || customGlowColor.value;
-            // 从 0 0 12px 改为 0 0 20px，透明度从 ff 改为 ff（全透），增加发光范围
-            glowStyle = `0 0 20px ${glowColor}ff, 0 0 30px ${glowColor}80`;
-        }
+        const colorInputs = document.querySelectorAll('.color-input');
+        colorInputs.forEach(input => {
+            input.addEventListener('touchstart', function(e) {
+                e.stopPropagation();
+                this.click();
+            });
+        });
 
-        const finalStyle = [shadowStyle, glowStyle].filter(Boolean).join(', ');
-        draggableText.style.textShadow = finalStyle || 'none';
-        polaroidText.style.textShadow = finalStyle || 'none';
-    }
-
-    let isDragging = false;
-    let offsetX = 0, offsetY = 0;
-
-    document.getElementById('imgContainer').addEventListener('mousedown', (e) => {
-        if (e.target !== draggableText) return;
-        isDragging = true;
-        const rect = draggableText.getBoundingClientRect();
-        offsetX = e.clientX - rect.left;
-        offsetY = e.clientY - rect.top;
-        draggableText.style.zIndex = 10;
-        e.preventDefault();
+        // ========== 初始化执行 ==========
+        initSavedStyle();
+        updateSliderStyle(bgPadding);
+        updateSliderStyle(bgOpacity);
+        initColorPickerBg();
     });
-
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        const containerRect = document.getElementById('imgContainer').getBoundingClientRect();
-        let x = e.clientX - containerRect.left - offsetX;
-        let y = e.clientY - containerRect.top - offsetY;
-        x = Math.max(0, Math.min(x, containerRect.width - draggableText.offsetWidth));
-        y = Math.max(0, Math.min(y, containerRect.height - draggableText.offsetHeight));
-        draggableText.style.left = `${x}px`;
-        draggableText.style.top = `${y}px`;
-        draggableText.style.transform = 'none';
-    });
-
-    document.addEventListener('mouseup', () => {
-        isDragging = false;
-        draggableText.style.zIndex = 1;
-    });
-
-    document.getElementById('imgContainer').addEventListener('touchstart', (e) => {
-        const touch = e.touches[0];
-        if (touch.target !== draggableText) return;
-        isDragging = true;
-        const rect = draggableText.getBoundingClientRect();
-        offsetX = touch.clientX - rect.left;
-        offsetY = touch.clientY - rect.top;
-        e.preventDefault();
-    });
-
-    document.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        const touch = e.touches[0];
-        const containerRect = document.getElementById('imgContainer').getBoundingClientRect();
-        let x = touch.clientX - containerRect.left - offsetX;
-        let y = touch.clientY - containerRect.top - offsetY;
-        x = Math.max(0, Math.min(x, containerRect.width - draggableText.offsetWidth));
-        y = Math.max(0, Math.min(y, containerRect.height - draggableText.offsetHeight));
-        draggableText.style.left = `${x}px`;
-        draggableText.style.top = `${y}px`;
-        draggableText.style.transform = 'none';
-        e.preventDefault();
-    });
-
-    document.addEventListener('touchend', () => {
-        isDragging = false;
-    });
-
-    document.getElementById('backBtn').addEventListener('click', () => {
-        window.location.href = './upload.html';
-    });
-
-    document.getElementById('previewBtn').addEventListener('click', () => {
-        const styleData = {
-            fontSize: fontSizeSlider.value,
-            color: draggableText.style.color,
-            bg: draggableText.style.background,
-            bgPadding: bgPadding.value,
-            bgRadius: document.querySelector('.radius-btn.active').dataset.radius,
-            textShadow: draggableText.style.textShadow,
-            isPolaroid: isPolaroidOn(),
-            left: draggableText.style.left,
-            top: draggableText.style.top,
-            text: draggableText.textContent
-        };
-        localStorage.setItem('nfcTextStyle', JSON.stringify(styleData));
-        window.location.href = './index.html';
-    });
-
-    // 初始化滑块样式
-    updateSliderStyle(document.getElementById('bgPadding'));
-    updateSliderStyle(document.getElementById('bgOpacity'));
-    
-    // 初始化颜色选择器背景
-    document.querySelector('#customTextColor').parentElement.style.background = customTextColor.value;
-    document.querySelector('#customBgColor').parentElement.style.background = customBgColor.value;
-    document.querySelector('#customShadowColor').parentElement.style.background = customShadowColor.value;
-    document.querySelector('#customGlowColor').parentElement.style.background = customGlowColor.value;
 </script>
 </body>
 </html>
