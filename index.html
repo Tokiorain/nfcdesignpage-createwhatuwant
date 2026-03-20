@@ -125,6 +125,8 @@
             justify-content: center;
             text-align: center;
             padding: 20px;
+            box-sizing: border-box; /* 防止padding撑出宽度 */
+            min-width: 300px; /* 给父容器最小宽度，避免压缩文字 */
         }
         /* 弥散按钮 */
         .go-make-btn {
