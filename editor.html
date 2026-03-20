@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Let your creativity flow!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            /* 浅蓝+浅粉+浅黄低饱和渐变背景 */
+            background: linear-gradient(135deg, #f9f7fd, #f7f9fd, #fffbf0);
+            min-height: 100vh;
+            /* 手机端增大上下内边距，避免拥挤 */
+            padding: 25px 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 500px;
+            width: 100%;
+            /* 手机端增加左右留白 */
+            padding: 0 8px;
+        }
+        h1 {
+            /* 浅粉主色 + 文字弥散阴影 */
+            color: #e8869c;
+            font-size: 22px;
+            text-align: center;
+            margin-bottom: 22px;
+            font-weight: 600;
+            text-shadow: 0 2px 8px rgba(232, 134, 156, 0.12);
+        }
+
+        .preview-card {
+            /* 弥散风卡片：玻璃拟态+浅色系阴影 */
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            /* 增大内边距，避免拥挤 */
+            padding: 20px;
+            box-shadow: 
+                0 8px 24px rgba(186, 200, 255, 0.1),
+                0 4px 12px rgba(255, 218, 230, 0.08);
+            margin-bottom: 25px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+        .preview-img-wrap {
+            position: relative;
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            /* 图片容器增加圆角，更柔和 */
+            box-shadow: 0 4px 15px rgba(184, 208, 255, 0.1);
+        }
+        #previewImg {
+            width: 100%;
+            display: block;
+        }
+        #draggableText {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 24px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.6);
+            cursor: text;
+            user-select: text;
+            padding: 10px 16px;
+            border-radius: 8px;
+            touch-action: none;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-width: 90%;
+            text-align: center;
+            background: transparent;
+            border: none;
+            outline: none;
+        }
+        .polaroid-text {
+            display: none;
+            /* 增大拍立得文字内边距 */
+            padding: 20px 0;
+            text-align: center;
+            font-size: 22px;
+            color: #333;
+            white-space: pre-wrap;
+            word-break: break-word;
+            cursor: text;
+            user-select: text;
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 100%;
+        }
+        .polaroid-text.show {
+            display: block;
+        }
+
+        .panel {
+            /* 弥散风控制面板 */
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            /* 增大内边距，优化手机端拥挤问题 */
+            padding: 24px 22px;
+            box-shadow: 
+                0 6px 18px rgba(186, 200, 255, 0.08),
+                0 3px 8px rgba(255, 218, 230, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+        .section {
+            /* 增大模块间距 */
+            margin-bottom: 24px;
+        }
+        .section-title {
+            font-size: 15px;
+            color: #334155;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+        }
+        .toggle-label {
+            font-size: 15px;
+            color: #374151;
+        }
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            /* 浅色系开关默认色 */
+            background: #e8f0fe;
+            border-radius: 999px;
+            position: relative;
+            transition: background 0.2s;
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .toggle-switch.active {
+            /* 浅蓝主色激活态 */
+            background: #8ab4f8;
+        }
+        .toggle-switch.active::after {
+            left: 22px;
+        }
+
+        .slider-box {
+            margin-top: 10px;
+            width: 100%;
+            /* 增大滑块区域上下内边距 */
+            padding: 12px 0;
+        }
+        .slider {
+            width: 100%;
+            height: 8px;
+            /* 浅蓝滑块渐变 */
+            background: linear-gradient(to right, #8ab4f8 0%, #8ab4f8 50%, #f0f4f8 50%, #f0f4f8 100%);
+            border-radius: 4px;
+            -webkit-appearance: none;
+            outline: none;
+        }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            /* 浅蓝滑块按钮 + 弥散阴影 */
+            background: #8ab4f8;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(138, 180, 248, 0.3);
+        }
+        .size-value {
+            text-align: right;
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+
+        .colors {
+            display: flex;
+            flex-wrap: wrap;
+            /* 增大颜色圆点间距 */
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .color-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .color-dot:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 10px rgba(138, 180, 248, 0.2);
+        }
+        .color-dot.active {
+            /* 浅蓝激活边框 */
+            outline: 3px solid #8ab4f8;
+            outline-offset: 2px;
+        }
+        .color-input {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            padding: 0;
+        }
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .color-tip {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .collapse {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f8fafc;
+        }
+        .collapse.show {
+            display: block;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px 0;
+            border-radius: 18px;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: #fff;
+            /* 增大按钮间距 */
+            margin-top: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .btn-back {
+    /* 浅蓝低饱和按钮（替换原来的深灰色） */
+    background: #b8d0ff;
+    color: #475569;
+}
+.btn-back:hover {
+    background: #a8c7ff;
+    box-shadow: 0 6px 15px rgba(184, 208, 255, 0.2);
+}
+        .btn-preview {
+            /* 浅粉+浅黄渐变按钮 */
+            background: linear-gradient(135deg, #f8a8c1, #ffe0b5);
+            color: #475569;
+        }
+        .btn-preview:hover {
+            background: linear-gradient(135deg, #fcb8d2, #ffd49a);
+            box-shadow: 0 6px 15px rgba(248, 168, 193, 0.2);
+        }
+
+        .radius-btn-group {
+            display: flex;
+            /* 增大圆角按钮间距 */
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .radius-btn {
+            flex: 1;
+            padding: 10px 0;
+            border-radius: 10px;
+            border: 1px solid #e8f0fe;
+            /* 浅色系按钮背景 */
+            background: #f9fafe;
+            color: #374151;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .radius-btn.active {
+            /* 浅蓝激活态 */
+            background: #8ab4f8;
+            color: #fff;
+            border-color: #8ab4f8;
+            box-shadow: 0 2px 8px rgba(138, 180, 248, 0.2);
+        }
+
+        .tip {
+            text-align: center;
+            font-size: 12px;
+            color: #9ca3af;
+            /* 增大提示文字上下间距 */
+            margin: 18px 0 8px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Let's start designing!</h1>
+
+    <div class="preview-card">
+        <div class="preview-img-wrap" id="imgContainer">
+            <img id="previewImg" alt="图片">
+            <div contenteditable="true" id="draggableText"></div>
+        </div>
+        <div contenteditable="true" class="polaroid-text" id="polaroidText"></div>
+    </div>
+
+    <div class="panel">
+        <div class="section">
+            <div class="toggle">
+                <div class="toggle-label">Display text below the image.</div>
+                <div class="toggle-switch" id="polaroidToggle"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Font Size</div>
+            <div class="slider-box">
+                <input type="range" id="fontSizeSlider" class="slider" min="12" max="60" value="24">
+                <div class="size-value"><span id="sizeNum">24</span>px</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Text Color</div>
+            <div class="colors" id="textColors">
+                <button class="color-dot active" style="background:#f8f9fa" data-color="#f8f9fa"></button>
+                <button class="color-dot" style="background:#495057" data-color="#495057"></button>
+                <button class="color-dot" style="background:#e2b1b1" data-color="#e2b1b1"></button>
+                <button class="color-dot" style="background:#b1d1b1" data-color="#b1d1b1"></button>
+                <button class="color-dot" style="background:#a9c0d1" data-color="#a9c0d1"></button>
+                <button class="color-dot" style="background:#e6d4a1" data-color="#e6d4a1"></button>
+                <button class="color-dot" style="background:#d4b4d4" data-color="#d4b4d4"></button>
+                <button class="color-dot" style="background:#a1d1d1" data-color="#a1d1d1"></button>
+                <button class="color-dot" style="background:#e6bc91" data-color="#e6bc91"></button>
+                <button class="color-dot" style="background:#b4a1d1" data-color="#b4a1d1"></button>
+                <button class="color-dot" style="background:#91bce6" data-color="#91bce6"></button>
+                <button class="color-dot" style="background:#c0d9a1" data-color="#c0d9a1"></button>
+                <button class="color-dot" style="background:#e6a1b4" data-color="#e6a1b4"></button>
+                <button class="color-dot" style="background:#a1d9c0" data-color="#a1d9c0"></button>
+                <button class="color-dot" style="background:#b1b1b1" data-color="#b1b1b1"></button>
+                <button class="color-dot" style="background:#917070" data-color="#917070"></button>
+                <button class="color-dot" style="background:#709170" data-color="#709170"></button>
+                <button class="color-dot" style="background:#707091" data-color="#707091"></button>
+            </div>
+            <div class="color-row">
+                <input type="color" id="customTextColor" class="color-input" value="#ffffff">
+                <span class="color-tip">Custom Text Color</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="toggle">
+                <div class="toggle-label">Text background box</div>
+                <div class="toggle-switch" id="bgToggle"></div>
+            </div>
+            <div class="collapse" id="bgPanel">
+                <div class="section-title">Background Color</div>
+                <div class="colors" id="bgColors">
+                   <button class="color-dot active" style="background:#a9b4d1" data-color="#a9b4d1"></button>
+<button class="color-dot" style="background:#e2b1b1" data-color="#e2b1b1"></button>
+<button class="color-dot" style="background:#b1d1b1" data-color="#b1d1b1"></button>
+<button class="color-dot" style="background:#a1b4e6" data-color="#a1b4e6"></button>
+<button class="color-dot" style="background:#e6d4a1" data-color="#e6d4a1"></button>
+<button class="color-dot" style="background:#d4b4d4" data-color="#d4b4d4"></button>
+<button class="color-dot" style="background:#a1d1d1" data-color="#a1d1d1"></button>
+<button class="color-dot" style="background:#e6bc91" data-color="#e6bc91"></button>
+<button class="color-dot" style="background:#b1b1b1" data-color="#b1b1b1"></button>
+                </div>
+                <div class="color-row">
+                    <input type="color" id="customBgColor" class="color-input" value="#4263eb">
+                    <span class="color-tip">Custom Background Color</span>
+                </div>
+
+                <div class="slider-box" style="margin-top:10px">
+                    <div class="section-title">Background Size (Padding)</div>
+                    <input type="range" id="bgPadding" class="slider" min="0" max="30" value="10">
+                    <div class="size-value"><span id="bgPaddingNum">10</span>px</div>
+                </div>
+
+                <div class="slider-box" style="margin-top:10px">
+                    <div class="section-title">Background Opacity</div>
+                    <input type="range" id="bgOpacity" class="slider" min="10" max="100" value="70">
+                    <div class="size-value"><span id="bgOpacityNum">70</span>%</div>
+                </div>
+
+                <div class="section-title" style="margin-top:10px">Background Shape</div>
+                <div class="radius-btn-group">
+                    <button class="radius-btn active" data-radius="8">Rounded corners</button>
+                    <button class="radius-btn" data-radius="0">Square corners</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="toggle">
+                <div class="toggle-label">Text Shadow</div>
+                <div class="toggle-switch" id="shadowToggle"></div>
+            </div>
+            <div class="collapse" id="shadowPanel">
+                <div class="colors" id="shadowColors">
+                    <button class="color-dot active" style="background:#333333" data-color="#333333"></button> <!-- 深灰（万能款） -->
+<button class="color-dot" style="background:#000000" data-color="#000000"></button> <!-- 纯黑（强对比） -->
+<button class="color-dot" style="background:#666666" data-color="#666666"></button> <!-- 中灰（柔和） -->
+<button class="color-dot" style="background:#222244" data-color="#222244"></button> <!-- 深蓝灰（冷调） -->
+<button class="color-dot" style="background:#442222" data-color="#442222"></button> <!-- 深红棕（暖调） -->
+<button class="color-dot" style="background:#224422" data-color="#224422"></button> <!-- 深绿灰（森系） -->
+<button class="color-dot" style="background:#443322" data-color="#443322"></button> <!-- 深棕黄（复古） -->
+<button class="color-dot" style="background:#ffffff" data-color="#ffffff"></button> <!-- 纯白（深色背景） -->
+<button class="color-dot" style="background:#888888" data-color="#888888"></button> <!-- 浅灰（低对比） -->
+                </div>
+                <div class="color-row">
+                    <input type="color" id="customShadowColor" class="color-input" value="#000000">
+                    <span class="color-tip">Custom Shadow Color</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="toggle">
+                <div class="toggle-label">Text Outer Glow
+</div>
+                <div class="toggle-switch" id="glowToggle"></div>
+            </div>
+            <div class="collapse" id="glowPanel">
+                <div class="colors" id="glowColors">
+                    <button class="color-dot active" style="background:#ffffff" data-color="#ffffff"></button> <!-- 纯白（万能款） -->
+<button class="color-dot" style="background:#eeeeee" data-color="#eeeeee"></button> <!-- 浅灰（超柔和） -->
+<button class="color-dot" style="background:#ffdddd" data-color="#ffdddd"></button> <!-- 浅粉（温馨） -->
+<button class="color-dot" style="background:#ddffdd" data-color="#ddffdd"></button> <!-- 浅绿（清新） -->
+<button class="color-dot" style="background:#ddddff" data-color="#ddddff"></button> <!-- 浅蓝（清冷） -->
+<button class="color-dot" style="background:#fff0dd" data-color="#fff0dd"></button> <!-- 浅橙（暖调） -->
+<button class="color-dot" style="background:#f0ddff" data-color="#f0ddff"></button> <!-- 浅紫（梦幻） -->
+<button class="color-dot" style="background:#ddfff0" data-color="#ddfff0"></button> <!-- 浅青（治愈） -->
+<button class="color-dot" style="background:#000000" data-color="#000000"></button> <!-- 纯黑（深色文字用） -->
+                </div>
+                <div class="color-row">
+                    <input type="color" id="customGlowColor" class="color-input" value="#ffffff">
+                    <span class="color-tip">Custom Outer Glow Color</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-back" id="backBtn">Reupload Image</button>
+        <button class="btn btn-preview" id="previewBtn">I'm done!</button>
+
+        <p class="tip">Edit text by enabling the display below the image · Drag text to move it ·</p>
+    </div>
+</div>
+
+<script>
+    const imgUrl = localStorage.getItem('nfcImage');
+    const textContent = localStorage.getItem('nfcText') || '';
+    const savedStyle = JSON.parse(localStorage.getItem('nfcTextStyle') || '{}');
+    if (!imgUrl) window.location.href = './index.html';
+
+    const previewImg = document.getElementById('previewImg');
+    const draggableText = document.getElementById('draggableText');
+    const polaroidText = document.getElementById('polaroidText');
+    const polaroidToggle = document.getElementById('polaroidToggle');
+    const fontSizeSlider = document.getElementById('fontSizeSlider');
+    const sizeNum = document.getElementById('sizeNum');
+
+    const bgToggle = document.getElementById('bgToggle');
+    const shadowToggle = document.getElementById('shadowToggle');
+    const glowToggle = document.getElementById('glowToggle');
+
+    previewImg.src = imgUrl;
+    draggableText.textContent = textContent;
+    polaroidText.textContent = textContent;
+
+    function isPolaroidOn() {
+        return polaroidToggle.classList.contains('active');
+    }
+
+    function initSavedStyle() {
+        if (savedStyle.isPolaroid) {
+            polaroidToggle.classList.add('active');
+            draggableText.style.display = 'none';
+            polaroidText.classList.add('show');
+        }
+
+        if (savedStyle.fontSize) {
+            fontSizeSlider.value = savedStyle.fontSize;
+            sizeNum.textContent = savedStyle.fontSize;
+            draggableText.style.fontSize = `${savedStyle.fontSize}px`;
+            polaroidText.style.fontSize = `${savedStyle.fontSize}px`;
+        }
+
+        if (savedStyle.color) {
+            draggableText.style.color = savedStyle.color;
+            polaroidText.style.color = savedStyle.color;
+            const textColorDot = Array.from(document.querySelectorAll('#textColors .color-dot')).find(d => d.dataset.color === savedStyle.color);
+            if (textColorDot) {
+                document.querySelectorAll('#textColors .color-dot').forEach(d => d.classList.remove('active'));
+                textColorDot.classList.add('active');
+                document.getElementById('customTextColor').value = savedStyle.color;
+            }
+        }
+
+        if (savedStyle.bg) {
+            bgToggle.classList.add('active');
+            document.getElementById('bgPanel').classList.add('show');
+            draggableText.style.background = savedStyle.bg;
+            polaroidText.style.background = savedStyle.bg;
+
+            if (savedStyle.bgPadding) {
+                document.getElementById('bgPadding').value = savedStyle.bgPadding;
+                document.getElementById('bgPaddingNum').textContent = savedStyle.bgPadding;
+                draggableText.style.padding = `${savedStyle.bgPadding}px ${savedStyle.bgPadding * 1.6}px`;
+                polaroidText.style.padding = `${savedStyle.bgPadding}px ${savedStyle.bgPadding * 1.6}px`;
+            }
+
+            if (savedStyle.bgRadius) {
+                document.querySelectorAll('.radius-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.radius === savedStyle.bgRadius) btn.classList.add('active');
+                });
+                draggableText.style.borderRadius = `${savedStyle.bgRadius}px`;
+                polaroidText.style.borderRadius = `${savedStyle.bgRadius}px`;
+            }
+        }
+
+        if (savedStyle.textShadow && savedStyle.textShadow.includes('0 2px 6px')) {
+            shadowToggle.classList.add('active');
+            document.getElementById('shadowPanel').classList.add('show');
+            const shadowColor = savedStyle.textShadow.match(/#[0-9a-fA-F]{6}/)?.[0] || '#000000';
+            const shadowDot = Array.from(document.querySelectorAll('#shadowColors .color-dot')).find(d => d.dataset.color === shadowColor);
+            if (shadowDot) {
+                document.querySelectorAll('#shadowColors .color-dot').forEach(d => d.classList.remove('active'));
+                shadowDot.classList.add('active');
+            }
+            document.getElementById('customShadowColor').value = shadowColor;
+        }
+
+        if (savedStyle.textShadow && savedStyle.textShadow.includes('0 0 12px')) {
+            glowToggle.classList.add('active');
+            document.getElementById('glowPanel').classList.add('show');
+            const glowColor = savedStyle.textShadow.match(/#[0-9a-fA-F]{6}/)?.[0] || '#ffffff';
+            const glowDot = Array.from(document.querySelectorAll('#glowColors .color-dot')).find(d => d.dataset.color === glowColor);
+            if (glowDot) {
+                document.querySelectorAll('#glowColors .color-dot').forEach(d => d.classList.remove('active'));
+                glowDot.classList.add('active');
+            }
+            document.getElementById('customGlowColor').value = glowColor;
+        }
+
+        if (savedStyle.left && savedStyle.top) {
+            draggableText.style.left = savedStyle.left;
+            draggableText.style.top = savedStyle.top;
+            draggableText.style.transform = 'none';
+        }
+
+        updateSliderStyle(fontSizeSlider);
+        updateSliderStyle(document.getElementById('bgPadding'));
+        updateSliderStyle(document.getElementById('bgOpacity'));
+        updateTextEffect();
+    }
+
+    initSavedStyle();
+
+    polaroidToggle.addEventListener('click', () => {
+    polaroidToggle.classList.toggle('active');
+    const on = isPolaroidOn();
+    draggableText.style.display = on ? 'none' : 'block';
+    polaroidText.classList.toggle('show', on);
+    
+    // 核心修复：关闭拍立得时清空衬框样式
+    if (!on) {
+        polaroidText.style.background = 'transparent';
+        polaroidText.style.padding = '0';
+        polaroidText.style.borderRadius = '0';
+        polaroidText.style.display = 'none'; // 彻底隐藏
+    } else {
+        // 开启拍立得时，同步当前衬框样式
+        if (bgToggle.classList.contains('active')) {
+            updateBgStyle();
+        }
+    }
+});
+
+    draggableText.addEventListener('input', () => {
+        polaroidText.textContent = draggableText.textContent;
+        localStorage.setItem('nfcText', draggableText.textContent);
+    });
+    polaroidText.addEventListener('input', () => {
+        draggableText.textContent = polaroidText.textContent;
+        localStorage.setItem('nfcText', polaroidText.textContent);
+    });
+
+    function updateSliderStyle(slider) {
+        const val = (slider.value - slider.min) / (slider.max - slider.min) * 100;
+        // 滑块渐变改为浅蓝主色
+        slider.style.background = `linear-gradient(to right, #8ab4f8 0%, #8ab4f8 ${val}%, #f0f4f8 ${val}%, #f0f4f8 100%)`;
+    }
+
+    fontSizeSlider.addEventListener('input', () => {
+        const size = fontSizeSlider.value;
+        sizeNum.textContent = size;
+        draggableText.style.fontSize = `${size}px`;
+        polaroidText.style.fontSize = `${size}px`;
+        updateSliderStyle(fontSizeSlider);
+    });
+
+    const textColorDots = document.querySelectorAll('#textColors .color-dot');
+    const customTextColor = document.getElementById('customTextColor');
+
+    textColorDots.forEach(dot => {
+        dot.addEventListener('click', () => {
+            textColorDots.forEach(d => d.classList.remove('active'));
+            dot.classList.add('active');
+            const color = dot.dataset.color;
+            draggableText.style.color = color;
+            polaroidText.style.color = color;
+            customTextColor.value = color;
+        });
+    });
+
+    customTextColor.addEventListener('input', () => {
+        textColorDots.forEach(d => d.classList.remove('active'));
+        const color = customTextColor.value;
+        draggableText.style.color = color;
+        polaroidText.style.color = color;
+    });
+
+    const bgPanel = document.getElementById('bgPanel');
+    const bgColorDots = document.querySelectorAll('#bgColors .color-dot');
+    const customBgColor = document.getElementById('customBgColor');
+    const bgPadding = document.getElementById('bgPadding');
+    const bgPaddingNum = document.getElementById('bgPaddingNum');
+    const bgOpacity = document.getElementById('bgOpacity');
+    const bgOpacityNum = document.getElementById('bgOpacityNum');
+    const radiusBtns = document.querySelectorAll('.radius-btn');
+
+    bgToggle.addEventListener('click', () => {
+    bgToggle.classList.toggle('active');
+    bgPanel.classList.toggle('show', bgToggle.classList.contains('active'));
+
+    if (!bgToggle.classList.contains('active')) {
+        // 关闭衬框：清空所有文字的衬框
+        draggableText.style.background = 'transparent';
+        draggableText.style.padding = '10px 16px';
+        draggableText.style.borderRadius = '8px';
+        
+        polaroidText.style.background = 'transparent';
+        polaroidText.style.padding = '0';
+        polaroidText.style.borderRadius = '0';
+    } else {
+        // 开启衬框：同步样式（拍立得开/关都要更）
+        updateBgStyle();
+    }
+});
+
+    bgColorDots.forEach(dot => {
+        dot.addEventListener('click', () => {
+            if (!bgToggle.classList.contains('active')) return;
+            bgColorDots.forEach(d => d.classList.remove('active'));
+            dot.classList.add('active');
+            customBgColor.value = dot.dataset.color;
+            updateBgStyle();
+        });
+    });
+
+    customBgColor.addEventListener('input', () => {
+        if (!bgToggle.classList.contains('active')) return;
+        bgColorDots.forEach(d => d.classList.remove('active'));
+        updateBgStyle();
+    });
+
+    bgPadding.addEventListener('input', () => {
+        if (!bgToggle.classList.contains('active')) return;
+        const padding = bgPadding.value;
+        bgPaddingNum.textContent = padding;
+        updateSliderStyle(bgPadding);
+        updateBgStyle();
+    });
+
+    bgOpacity.addEventListener('input', () => {
+        if (!bgToggle.classList.contains('active')) return;
+        const opacity = bgOpacity.value;
+        bgOpacityNum.textContent = opacity;
+        updateSliderStyle(bgOpacity);
+        updateBgStyle();
+    });
+
+    radiusBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (!bgToggle.classList.contains('active')) return;
+            radiusBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateBgStyle();
+        });
+    });
+
+    function updateBgStyle() {
+        const color = document.querySelector('#bgColors .active')?.dataset.color || customBgColor.value;
+        const opacity = bgOpacity.value / 100;
+        const padding = bgPadding.value;
+        const radius = document.querySelector('.radius-btn.active').dataset.radius;
+        const rgbaColor = `${color}${Math.floor(opacity * 255).toString(16).padStart(2, '0')}`;
+
+        draggableText.style.background = rgbaColor;
+        draggableText.style.padding = `${padding}px ${padding * 1.6}px`;
+        draggableText.style.borderRadius = `${radius}px`;
+
+        polaroidText.style.background = rgbaColor;
+        polaroidText.style.padding = `${padding}px ${padding * 1.6}px`;
+        polaroidText.style.borderRadius = `${radius}px`;
+
+        // 关键修复：只有拍立得开启时才设置居中块
+        if (isPolaroidOn()) {
+            polaroidText.style.display = 'inline-block';
+            polaroidText.style.margin = '0 auto';
+        }
+    }
+
+    const shadowPanel = document.getElementById('shadowPanel');
+    const shadowColorDots = document.querySelectorAll('#shadowColors .color-dot');
+    const customShadowColor = document.getElementById('customShadowColor');
+    const glowPanel = document.getElementById('glowPanel');
+    const glowColorDots = document.querySelectorAll('#glowColors .color-dot');
+    const customGlowColor = document.getElementById('customGlowColor');
+
+    shadowToggle.addEventListener('click', () => {
+        shadowToggle.classList.toggle('active');
+        shadowPanel.classList.toggle('show', shadowToggle.classList.contains('active'));
+        updateTextEffect();
+    });
+
+    shadowColorDots.forEach(dot => {
+        dot.addEventListener('click', () => {
+            if (!shadowToggle.classList.contains('active')) return;
+            shadowColorDots.forEach(d => d.classList.remove('active'));
+            dot.classList.add('active');
+            customShadowColor.value = dot.dataset.color;
+            updateTextEffect();
+        });
+    });
+
+    customShadowColor.addEventListener('input', () => {
+        if (!shadowToggle.classList.contains('active')) return;
+        shadowColorDots.forEach(d => d.classList.remove('active'));
+        updateTextEffect();
+    });
+
+    glowToggle.addEventListener('click', () => {
+        glowToggle.classList.toggle('active');
+        glowPanel.classList.toggle('show', glowToggle.classList.contains('active'));
+        updateTextEffect();
+    });
+
+    glowColorDots.forEach(dot => {
+        dot.addEventListener('click', () => {
+            if (!glowToggle.classList.contains('active')) return;
+            glowColorDots.forEach(d => d.classList.remove('active'));
+            dot.classList.add('active');
+            customGlowColor.value = dot.dataset.color;
+            updateTextEffect();
+        });
+    });
+
+    customGlowColor.addEventListener('input', () => {
+        if (!glowToggle.classList.contains('active')) return;
+        glowColorDots.forEach(d => d.classList.remove('active'));
+        updateTextEffect();
+    });
+
+    function updateTextEffect() {
+        let shadowStyle = '';
+        let glowStyle = '';
+
+        if (shadowToggle.classList.contains('active')) {
+            const shadowColor = document.querySelector('#shadowColors .active')?.dataset.color || customShadowColor.value;
+            shadowStyle = `0 2px 6px ${shadowColor}80`;
+        }
+
+        if (glowToggle.classList.contains('active')) {
+            const glowColor = document.querySelector('#glowColors .active')?.dataset.color || customGlowColor.value;
+            glowStyle = `0 0 12px ${glowColor}ff`;
+        }
+
+        const finalStyle = [shadowStyle, glowStyle].filter(Boolean).join(', ');
+        draggableText.style.textShadow = finalStyle || 'none';
+        polaroidText.style.textShadow = finalStyle || 'none';
+    }
+
+    let isDragging = false;
+    let offsetX = 0, offsetY = 0;
+
+    document.getElementById('imgContainer').addEventListener('mousedown', (e) => {
+        if (e.target !== draggableText) return;
+        isDragging = true;
+        const rect = draggableText.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        draggableText.style.zIndex = 10;
+        e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const containerRect = document.getElementById('imgContainer').getBoundingClientRect();
+        let x = e.clientX - containerRect.left - offsetX;
+        let y = e.clientY - containerRect.top - offsetY;
+        x = Math.max(0, Math.min(x, containerRect.width - draggableText.offsetWidth));
+        y = Math.max(0, Math.min(y, containerRect.height - draggableText.offsetHeight));
+        draggableText.style.left = `${x}px`;
+        draggableText.style.top = `${y}px`;
+        draggableText.style.transform = 'none';
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        draggableText.style.zIndex = 1;
+    });
+
+    document.getElementById('imgContainer').addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        if (touch.target !== draggableText) return;
+        isDragging = true;
+        const rect = draggableText.getBoundingClientRect();
+        offsetX = touch.clientX - rect.left;
+        offsetY = touch.clientY - rect.top;
+        e.preventDefault();
+    });
+
+    document.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        const containerRect = document.getElementById('imgContainer').getBoundingClientRect();
+        let x = touch.clientX - containerRect.left - offsetX;
+        let y = touch.clientY - containerRect.top - offsetY;
+        x = Math.max(0, Math.min(x, containerRect.width - draggableText.offsetWidth));
+        y = Math.max(0, Math.min(y, containerRect.height - draggableText.offsetHeight));
+        draggableText.style.left = `${x}px`;
+        draggableText.style.top = `${y}px`;
+        draggableText.style.transform = 'none';
+        e.preventDefault();
+    });
+
+    document.addEventListener('touchend', () => {
+        isDragging = false;
+    });
+
+    document.getElementById('backBtn').addEventListener('click', () => {
+        window.location.href = './upload.html';
+    });
+
+    document.getElementById('previewBtn').addEventListener('click', () => {
+        const styleData = {
+            fontSize: fontSizeSlider.value,
+            color: draggableText.style.color,
+            bg: draggableText.style.background,
+            bgPadding: bgPadding.value,
+            bgRadius: document.querySelector('.radius-btn.active').dataset.radius,
+            textShadow: draggableText.style.textShadow,
+            isPolaroid: isPolaroidOn(),
+            left: draggableText.style.left,
+            top: draggableText.style.top,
+            text: draggableText.textContent
+        };
+        localStorage.setItem('nfcTextStyle', JSON.stringify(styleData));
+        window.location.href = './index.html';
+    });
+
+    updateSliderStyle(document.getElementById('bgPadding'));
+    updateSliderStyle(document.getElementById('bgOpacity'));
+</script>
+</body>
+</html>

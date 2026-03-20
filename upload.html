@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFC Graphic Creator | Customize Content</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "PingFang SC", "微软雅黑", sans-serif;
+    }
+    body {
+        background: linear-gradient(135deg, #f0f8ff, #fff5f8, #fffbf0);
+        min-height: 100vh;
+        padding: 30px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .container {
+        max-width: 500px;
+        width: 100%;
+        background: rgba(255,255,255,0.9);
+        padding: 35px;
+        border-radius: 24px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        backdrop-filter: blur(8px);
+        border: 1px solid #fff;
+    }
+    h1 {
+        color: #8ab4f8;
+        font-size: 22px;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .upload-area {
+        border: 2px dashed #c7d2fe;
+        border-radius: 16px;
+        padding: 45px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 25px;
+        background: rgba(245,250,255,0.5);
+    }
+    .upload-area:hover {
+        border-color: #8ab4f8;
+        background: rgba(240,248,255,0.7);
+    }
+    .upload-icon {
+        font-size: 48px;
+        color: #f8a8c1;
+        margin-bottom: 12px;
+    }
+    .upload-text {
+        color: #64748b;
+        font-size: 16px;
+    }
+    #fileInput {
+        display: none;
+    }
+    .img-preview {
+        display: none;
+        max-width: 100%;
+        max-height: 280px;
+        border-radius: 12px;
+        margin: 15px auto;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+    .text-input-wrap {
+        margin: 25px 0;
+    }
+    label {
+        display: block;
+        color: #334155;
+        font-size: 15px;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+    #textInput {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 16px;
+        resize: none;
+        min-height: 80px;
+    }
+    #textInput:focus {
+        outline: none;
+        border-color: #8ab4f8;
+    }
+    .btn {
+        width: 100%;
+        padding: 15px 0;
+        border: none;
+        border-radius: 30px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+    }
+    .preview-btn {
+        background: linear-gradient(90deg, #8ab4f8, #f8a8c1);
+        color: #fff;
+    }
+    .preview-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(138,180,248,0.2);
+    }
+    .preview-btn:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    .tip {
+        text-align: center;
+        color: #94a3b8;
+        font-size: 14px;
+        margin: 10px 0;
+    }
+    .error-tip {
+        color: #ef4444;
+        display: none;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Create Your Exclusive NFC Graphics</h1>
+
+    <div class="upload-area" id="uploadArea">
+        <div class="upload-icon">🖼️</div>
+        <div class="upload-text">Tap to upload your picture.<br>(JPG/PNG, max 3MB)</div>
+        <input type="file" id="fileInput" accept="image/jpeg,image/png">
+    </div>
+    <img src="" alt="Preview" class="img-preview" id="imgPreview">
+
+    <div class="tip error-tip" id="errorTip"></div>
+
+    <div class="text-input-wrap">
+        <label>What text do you want to display?</label>
+        <textarea id="textInput" placeholder="For example: You don’t have to type anything."></textarea>
+    </div>
+
+    <button class="btn preview-btn" id="previewBtn" disabled>Start typesetting!</button>
+</div>
+
+<script>
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const imgPreview = document.getElementById('imgPreview');
+    const textInput = document.getElementById('textInput');
+    const previewBtn = document.getElementById('previewBtn');
+    const errorTip = document.getElementById('errorTip');
+
+    let imageDataUrl = '';
+
+    // 点击上传
+    uploadArea.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    // 选择图片
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // 格式校验
+        if (!file.type.match('image.*')) {
+            errorTip.innerText = 'Only JPG/PNG formats are supported!';
+            errorTip.style.display = 'block';
+            return;
+        }
+        // 大小校验
+        if (file.size > 3 * 1024 * 1024) {
+            errorTip.innerText = 'Image size must not exceed 3MB!';
+            errorTip.style.display = 'block';
+            return;
+        }
+
+        // 预览
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            imageDataUrl = e.target.result;
+            imgPreview.src = imageDataUrl;
+            imgPreview.style.display = 'block';
+            errorTip.style.display = 'none';
+            previewBtn.disabled = false;
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // 排版按钮
+    previewBtn.addEventListener('click', () => {
+        localStorage.setItem('nfcImage', imageDataUrl);
+        localStorage.setItem('nfcText', textInput.value.trim() || '');
+        window.location.href = './editor.html';
+    });
+</script>
+
+</body>
+</html>
