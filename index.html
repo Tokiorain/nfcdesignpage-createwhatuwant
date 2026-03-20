@@ -145,6 +145,74 @@ if (imgUrl) {
 
 goMakeBtn.onclick = () => location.href = 'upload.html';
 backBtn.onclick = () => location.href = 'upload.html';
+
+// ======================== 仅追加以下修复代码，无任何删减 ========================
+// 1. 读取编辑页保存的文字内容
+const textContent = localStorage.getItem('nfcText') || '';
+
+// 2. 获取文字展示元素
+const resultDraggableText = document.getElementById('resultDraggableText');
+const resultPolaroidText = document.getElementById('resultPolaroidText');
+
+// 3. 设置文字内容（核心：修复文字不显示）
+resultDraggableText.textContent = textContent;
+resultPolaroidText.textContent = textContent;
+
+// 4. 应用编辑页保存的样式（完整还原所有样式）
+// 4.1 拍立得模式切换
+if (styleData.isPolaroid) {
+    resultDraggableText.style.display = 'none';
+    resultPolaroidText.style.display = 'block';
+    // 拍立得文字调整为底部居中
+    resultPolaroidText.style.top = 'auto';
+    resultPolaroidText.style.bottom = '0';
+    resultPolaroidText.style.transform = 'translateX(-50%)';
+    resultPolaroidText.style.width = '100%';
+}
+
+// 4.2 字体大小
+if (styleData.fontSize) {
+    resultDraggableText.style.fontSize = `${styleData.fontSize}px`;
+    resultPolaroidText.style.fontSize = `${styleData.fontSize}px`;
+}
+
+// 4.3 文字颜色
+if (styleData.color) {
+    resultDraggableText.style.color = styleData.color;
+    resultPolaroidText.style.color = styleData.color;
+}
+
+// 4.4 文字阴影/外发光
+if (styleData.textShadow) {
+    resultDraggableText.style.textShadow = styleData.textShadow;
+    resultPolaroidText.style.textShadow = styleData.textShadow;
+}
+
+// 4.5 背景框样式
+if (styleData.bg) {
+    resultDraggableText.style.background = styleData.bg;
+    resultPolaroidText.style.background = styleData.bg;
+    
+    // 背景内边距
+    if (styleData.bgPadding) {
+        resultDraggableText.style.padding = `${styleData.bgPadding}px ${styleData.bgPadding * 1.6}px`;
+        resultPolaroidText.style.padding = `${styleData.bgPadding}px ${styleData.bgPadding * 1.6}px`;
+    }
+    
+    // 背景圆角
+    if (styleData.bgRadius) {
+        resultDraggableText.style.borderRadius = `${styleData.bgRadius}px`;
+        resultPolaroidText.style.borderRadius = `${styleData.bgRadius}px`;
+    }
+}
+
+// 4.6 拖拽位置（仅悬浮文字生效）
+if (styleData.left && styleData.top && !styleData.isPolaroid) {
+    resultDraggableText.style.left = styleData.left;
+    resultDraggableText.style.top = styleData.top;
+    resultDraggableText.style.transform = 'none';
+}
+// ======================== 修复代码结束 ========================
 </script>
 </body>
 </html>
