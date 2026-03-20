@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <!-- 核心：UTF-8编码声明，解决乱码 -->
+    <!-- 核心：UTF-8编码声明，解决字符解析问题 -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>NFC图文制作 | 成果预览</title>
@@ -10,7 +10,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            /* 兜底字体，避免渲染异常 */
+            /* 兜底字体，兼容所有设备 */
             font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
         }
         body {
@@ -167,14 +167,23 @@
         .btn-shake {
             animation: shake 0.5s ease-in-out;
         }
-        /* 引导文字 */
+        /* 核心修复：引导文字排版（解决一个字母占一行） */
         .guide-tip {
             font-size: 14px;
             color: #6b7280;
             margin-bottom: 60px;
-            white-space: nowrap;
+            /* 允许正常换行，取消强制单行 */
+            white-space: normal;
+            /* 保证单词不被拆分成单个字母 */
+            word-wrap: break-word;
             overflow-wrap: break-word;
+            /* 限制最大宽度，避免撑满屏幕 */
             max-width: 90%;
+            /* 行高舒适，换行后不拥挤 */
+            line-height: 1.5;
+            /* 文字居中，排版更整齐 */
+            text-align: center;
+            /* 确保容器跟随内容宽度，不歪 */
             display: inline-block;
         }
         /* 底部链接 */
@@ -198,9 +207,9 @@
         /* 小屏手机（320-375px） */
         @media (max-width: 375px) {
             .guide-tip {
-                white-space: normal;
-                line-height: 1.5;
                 font-size: 13px;
+                max-width: 95%;
+                line-height: 1.6;
             }
             .go-make-btn {
                 padding: 14px 30px;
