@@ -127,6 +127,8 @@
             padding: 20px;
             box-sizing: border-box; /* 防止padding撑出宽度 */
             min-width: 300px; /* 给父容器最小宽度，避免压缩文字 */
+            margin: 0 auto; /* 容器自身水平居中 */
+            align-content: center; /* 兼容多元素居中 */
         }
         /* 弥散按钮 */
         .go-make-btn {
@@ -143,7 +145,7 @@
             font-size: 18px;
             font-weight: 500;
             cursor: pointer;
-            margin-bottom: 12px;
+            margin: 0 auto 20px;
             box-shadow: 0 6px 20px rgba(180, 190, 250, 0.15);
             transition: all 0.3s ease;
             outline: none;
